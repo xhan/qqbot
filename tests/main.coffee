@@ -9,8 +9,18 @@ test_net_request = ->
 console.log test_net_request()
 
 
-http = require('http')
-# test net request
-http.get "http://www.baidu.com", (res) ->
-    console.log "response: #{res.statusCode}"
-    
+# http = require('http')
+# 
+# 
+# 
+# http
+#   .get 'http://localhost/blog/archives-404/', (resp)->
+#       console.log "response: #{resp.statusCode}"
+#       resp.on 'data', (chunk) ->
+#           console.log chunk   
+#   .on "error", (e) ->
+#         console.log e
+
+api = require("../src/qqapi")
+
+api.check_qq '123774072'
