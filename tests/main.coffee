@@ -1,26 +1,28 @@
 #!/usr/bin/env coffee
-v = 78
-console.log "The value of v is '#{v}'"
 
-
-
-test_net_request = ->
-    "123"
-console.log test_net_request()
-
-
-# http = require('http')
-# 
-# 
-# 
-# http
-#   .get 'http://localhost/blog/archives-404/', (resp)->
-#       console.log "response: #{resp.statusCode}"
-#       resp.on 'data', (chunk) ->
-#           console.log chunk   
-#   .on "error", (e) ->
-#         console.log e
-
+int = (v) -> parseInt v
+log = console.log
 api = require("../src/qqapi")
 
-api.check_qq '123774072'
+
+log "testing..."
+
+
+
+
+
+test_check_qq = ->
+    api.check_qq '123774072' , (result) ->
+        log int result[0]
+        log result[1]
+        log result[2]
+
+
+test_encode_password = ->
+    log api.encode_password("123","!GZH",'\\x00\\x00\\x00\\x00\\x07\\x60\\xa4\\x78')
+
+# test_check_qq()
+test_encode_password()
+
+
+
