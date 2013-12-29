@@ -3,7 +3,7 @@ http  = require 'http'
 crypto = require 'crypto'
 querystring  = require 'querystring'
 Url = require('url')
-all_cookies = null
+all_cookies = []
 
 md5 = (str) ->
     md5sum = crypto.createHash 'md5'
@@ -43,9 +43,47 @@ exports.check_qq = (qq, callback) ->
               log e
               
 
-# 获取验证码url
-exports.get_verify_code_url = (qq) ->
-    "https://ssl.captcha.qq.com/getimage?aid=1003903&r=0.2509327069195215&uin=#{qq}"
+# 获取验证码
+# 记得call  finish_verify_code
+exports.get_verify_code = (qq , host, port, callback) ->
+    url = "https://ssl.captcha.qq.com/getimage?aid=1003903&r=0.2509327069195215&uin=#{qq}"
+    body = ''
+    
+    https.get url , (resp) ->
+        # log resp.headers
+        all_cookies = all_cookies.concat resp.headers['set-cookie']
+        resp.setEncoding 'binary'
+        resp.on 'data', (chunk) ->
+            body += chunk;
+        resp.on 'end', ->
+            create_img_server(host,port,body,resp.headers)            
+            callback()
+    .on "error", (e) ->
+       log e
+       callback(e)
+
+exports.finish_verify_code = -> stop_img_server()
+    
+
+img_server = null
+create_img_server = (host, port, body ,origin_headers) ->
+    return if img_server
+    
+    fs = require 'fs'
+    fs.writeFileSync 'tmp/t.jpg' , body , 'binary'
+    
+    img_server = http.createServer (req, res) ->
+      res.writeHead 200 , origin_headers
+      res.end body, 'binary'
+    
+    img_server.listen port
+
+    
+stop_img_server = ->    
+   img_server.close() if img_server
+   img_server = null    
+
+
 
 
 
@@ -64,14 +102,14 @@ exports.encode_password = (password , token , bits) ->
                   String.fromCharCode parseInt(byte_str,16)
               .join('')    
 
-    ret = md5( hex2ascii(password) + hex2ascii(bits) ).toUpperCase() + token
+    ret = md5( hex2ascii(password) + hex2ascii(bits) ).toUpperCase() + token.toUpperCase()
     ret = md5( ret ).toUpperCase()
 
     return ret
 
 
 # 登录 帐号密码验证码 校验
-exports.login = (qq, encode_password, verifycode, cookies , callback) ->
+exports.login = (qq, encode_password, verifycode , callback) ->
     path = "/login?u=#{qq}&p=#{encode_password}&verifycode=#{verifycode}&webqq_type=10&remember_uin=1&login2qq=1&aid=1003903&u1=http%3A%2F%2Fweb2.qq.com%2Floginproxy.html%3Flogin2qq%3D1%26webqq_type%3D10&h=1&ptredirect=0&ptlang=2052&daid=164&from_ui=1&pttype=1&dumy=&fp=loginerroralert&action=3-15-72115&mibao_css=m_webqq&t=1&g=1&js_type=0&js_ver=10062&login_sig=qBpuWCs9dlR9awKKmzdRhV8TZ8MfupdXF6zyHmnGUaEzun0bobwOhMh6m7FQjvWA"
     options = 
         host: 'ssl.ptlogin2.qq.com'
@@ -82,10 +120,10 @@ exports.login = (qq, encode_password, verifycode, cookies , callback) ->
     body = '';
     https
         .get options  , (resp) ->
-            log "response: #{resp.statusCode}"
+            # log "response: #{resp.statusCode}"
             # log all_cookies
             all_cookies = all_cookies.concat resp.headers['set-cookie']
-            log all_cookies
+            # log all_cookies
             resp.on 'data', (chunk) ->
                 body += chunk
             resp.on 'end', ->
@@ -100,7 +138,6 @@ exports.login = (qq, encode_password, verifycode, cookies , callback) ->
 
 
 # "http://d.web2.qq.com/channel/login2"
-
 exports.login_token = (callback) ->
 
     client_id = parseInt(Math.random() * 100000000)
