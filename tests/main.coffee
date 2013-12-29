@@ -41,7 +41,18 @@ test_login_full = ->
         api.login qq, new_pass , result[1], '', (ret)->
             log '登录结果'
             log ret
+            return unless ret[2].match /^http/
+                
+            log "开始登录2 cookie获取"
+            api.login_step2 ret[2] , (ret) ->                
+                log "开始登录 token 获取"
+                api.login_token (ret) ->
+                    log ret
+
+test_login_token = ->
+    api.post (ret) -> log ret
 
 # test_check_qq()
 # test_encode_password()
 test_login_full()
+# test_login_token()
