@@ -5,8 +5,6 @@ log = console.log
 auth = require "../src/qqauth"
 api  = require "../src/qqapi"
 
-log "testing..."
-
 config = require '../config'
 qq = config.account 
 pass = config.password
@@ -41,33 +39,8 @@ test_encode_password2 = ->
     log auth.encode_password(pass,'zkmm','\\x00\\x00\\x00\\x00\\xa5\\x13\\xed\\x18')
     # should equal to F16B5C4EBE52641313403CB93C0FF569
 
-
 test_login_full = ->
-
-    login_next = (qq , encoded_pass , verify_code)->
-        log "开始登录1 密码校验"
-        auth.login qq, encoded_pass , verify_code , (ret)->
-            log '登录结果'
-            log ret
-            return unless ret[2].match /^http/
                 
-            log "开始登录2 cookie获取"
-            auth.login_step2 ret[2] , (ret) ->                
-                log "开始登录3 token 获取"
-                auth.login_token (ret,client_id) ->
-                    if ret.retcode == 0
-                        log "登录成功"
-                        log "psessionid:",ret.result.psessionid
-                        log "clientid:",client_id
-                        log "长轮训"
-                        api.cookies( auth.cookies() )
-                        api.long_poll client_id , ret.result.psessionid , (ret)->
-                            log ret
-                    else
-                        log "登录失败"    
-                    log ret
-                    
-
     log "验证帐号..."
     auth.check_qq qq , (result) ->
         # log "验证帐号:", result
@@ -92,6 +65,53 @@ test_login_full = ->
             new_pass = auth.encode_password(pass,verify_code , bits )
             login_next( qq , new_pass , verify_code)    
 
+login_next = (qq , encoded_pass , verify_code)->
+    log "开始登录1 密码校验"
+    auth.login qq, encoded_pass , verify_code , (ret)->
+        log '登录结果'
+        log ret
+        return unless ret[2].match /^http/
+            
+        log "开始登录2 cookie获取"
+        auth.login_step2 ret[2] , (ret) ->                
+            log "开始登录3 token 获取"
+            auth.login_token (ret,client_id,ptwebqq) ->
+                if ret.retcode == 0          
+                    log '登录成功'                              
+                    # 保存信息
+                    api.cookies( auth.cookies() )
+                    api.defaults 'psessionid' , ret.result.psessionid
+                    api.defaults 'clientid'   , client_id
+                    api.defaults 'ptwebqq'    , ptwebqq
+                    api.defaults 'uin'        , ret.result.uin
+                    api.defaults 'vfwebqq'    , ret.result.vfwebqq
+                    api.defaults_save()
+                    
+                    after_logined()
+
+                else
+                    log "登录失败"    
+                    log ret
+
+
+after_logined = ->
+    
+    psessionid = api.defaults 'psessionid' 
+    client_id  = api.defaults 'clientid'   
+    ptwebqq    = api.defaults 'ptwebqq'    
+    uin        = api.defaults 'uin'
+    vfwebqq    = api.defaults 'vfwebqq'
+    
+
+    api.long_poll client_id , psessionid , (ret)->
+        log ret
+    
+    api.get_friend_list uin, ptwebqq, vfwebqq, (ret,e)->
+        log 'friend',ret
+    
+    api.get_group_list vfwebqq, (ret , e)->
+        log 'group',ret
+    
 
 test_login_token = ->
     auth.post (ret) -> log ret
@@ -101,17 +121,26 @@ test_get_verify_code = ->
     auth.get_verify_code qq, config.host, config.port, (error) ->
         log 'oh yeah'
 
-test_long_pull = ->
-    api.long_pull
+
+
+test_after_login = ->
+    api.defaults_read()
+    after_logined()
+
+    
+
 
 
 
 # test_check_qq()
 # test_encode_password2()
-test_login_full()
+
 # test_login_token()
 
 # test_get_verify_code()
 
+# test_get_list()
 
+test_login_full()
 
+# test_after_login()

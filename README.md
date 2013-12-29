@@ -21,4 +21,10 @@ QQBot
 
 * 10:23 昨晚一直卡在登录账户验证处，调试到凌晨终于通过登录验证的第一个环节。PS.使用coffee写代码还真是蛮清爽的
 * 15:07 去了趟医院，怎么就突然感冒咳嗽头晕了。成功搞定node http post以及获取到qq登录最后一步token。睡会会。  
-* 19:43 https://code.google.com/p/mingqq/ 发现了一款开源的webqq协议的win客户端，看截图完成度相当高。对了增加了验证码的支持
+* 19:43 发现了一款开源的webqq协议的win客户端MingQQ，看截图完成度相当高。对了增加了验证码的支持
+* 20:44 增加在线（轮训功能），进度比预期的慢了些。但又发现了些资料和文档，补充在底部
+
+资料
+----
+* 开源的webqq协议的win客户端 https://code.google.com/p/mingqq/
+* WebQQ协议专题  http://www.10qf.com/forum-52-1.html

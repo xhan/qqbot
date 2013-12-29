@@ -144,7 +144,7 @@ exports.login = (qq, encode_password, verifycode , callback) ->
 
 
 # "http://d.web2.qq.com/channel/login2"
-#  callback( ret , client_id )
+#  callback( ret , client_id , ptwebqq)
 exports.login_token = (callback) ->
     client_id = parseInt(Math.random() * 100000000)
     ptwebqq   = all_cookies.filter( (item)->item.match /ptwebqq/ )
@@ -184,7 +184,7 @@ exports.login_token = (callback) ->
             body += chunk
         resp.on 'end', ->
             ret = JSON.parse(body)
-            callback( ret , client_id )
+            callback( ret , client_id ,ptwebqq)
                     
     req.write(data);
     req.end();
