@@ -33,6 +33,7 @@ exports.defaults_save = ->
 exports.defaults_read = ->
     try
         defaults = JSON.parse( fs.readFileSync  'tmp/store.json' )
+        all_cookies  = defaults.cookie
     catch error
         log error        
 
