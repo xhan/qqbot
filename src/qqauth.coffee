@@ -12,6 +12,11 @@ md5 = (str) ->
 # TODO: logger 分级控制
 log   = console.log
 
+
+exports.cookies = ->
+    all_cookies
+
+
 # 是否需要 验证码
 # @param qq
 # @param callback -> [是否需要验证码 , token , bits ]
@@ -50,6 +55,7 @@ exports.get_verify_code = (qq , host, port, callback) ->
     body = ''
     
     https.get url , (resp) ->
+        log "verify code: #{resp.statusCode}"
         # log resp.headers
         all_cookies = all_cookies.concat resp.headers['set-cookie']
         resp.setEncoding 'binary'
@@ -138,8 +144,8 @@ exports.login = (qq, encode_password, verifycode , callback) ->
 
 
 # "http://d.web2.qq.com/channel/login2"
+#  callback( ret , client_id )
 exports.login_token = (callback) ->
-
     client_id = parseInt(Math.random() * 100000000)
     ptwebqq   = all_cookies.filter( (item)->item.match /ptwebqq/ )
                            .pop()
@@ -173,12 +179,12 @@ exports.login_token = (callback) ->
             'Cookie' : all_cookies
     
     req = http.request options, (resp) ->
-        log "response: #{resp.statusCode}"
+        log "login token response: #{resp.statusCode}"
         resp.on 'data', (chunk) ->
             body += chunk
         resp.on 'end', ->
             ret = JSON.parse(body)
-            callback( ret )
+            callback( ret , client_id )
                     
     req.write(data);
     req.end();
