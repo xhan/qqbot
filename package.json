@@ -1,0 +1,43 @@
+{
+  "name": "qqbot",
+  "version": "1.0.0",
+
+  "author": "xhan",
+
+  "keywords": [
+    "qqbot",
+    "hubot",
+    "bot"
+  ],
+
+  "description": "A robot lives on webQQ",
+
+  "licenses": [{
+    "type": "MIT",
+    "url": "https://raw.github.com/xhan/qqbot/master/LICENSE"
+  }],
+
+  "repository" : {
+    "type": "git",
+    "url": "https://github.com/xhan/qqbot.git"
+  },
+
+  "dependencies": {
+    "coffee-script":      ">= 1.6.3",
+    "optparse":           ">= 1.0.4",
+    "scoped-http-client": ">= 0.9.8",
+    "log":                ">= 1.4.0",
+    "express":            ">= 3.3.4"
+  },
+
+  "engines": {
+    "node": ">= 0.8.x",
+    "npm":  ">= 1.1.x"
+  },
+
+  "main": "./index",
+
+  "bin": {
+    "hubot": "./bin/hubot"
+  }
+}
