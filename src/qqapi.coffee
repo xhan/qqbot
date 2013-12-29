@@ -134,7 +134,7 @@ http_request = (options , params , callback) ->
         callback(null,e)
         
     if params and options.method == 'POST'
-        log data
+        # log data
         req.write(data);
     req.end();
 
@@ -151,6 +151,7 @@ http_post = (options , body, callback) ->
 #  @param ptwebqq : cookie
 #  @param vfwebqq : 登录后获得
 #  @param callback: ret, e
+#  retcode 0
 exports.get_friend_list = (uin, ptwebqq, vfwebqq, callback)->
     aurl = "http://s.web2.qq.com/api/get_user_friends2"
     r = 
@@ -165,10 +166,49 @@ exports.get_friend_list = (uin, ptwebqq, vfwebqq, callback)->
 
 #  @param vfwebqq : 登录后获得
 #  @param callback: ret, e
+#  retcode 0
 exports.get_group_list = ( vfwebqq, callback)->
     aurl = "http://s.web2.qq.com/api/get_group_name_list_mask2"    
-    r    =
-     vfwebqq:  vfwebqq
-    r = JSON.stringify r
+    r    = vfwebqq:  vfwebqq     
+    r    = JSON.stringify r
+    
     http_post {url:aurl} , {r:r} , (ret,e )->
         callback(ret,e)
+
+#  @param group_code: code
+#  @param vfwebqq : 登录后获得
+#  @param callback: ret, e
+#  retcode 0
+exports.get_group_member = (group_code, vfwebqq, callback)->
+    url = "http://s.web2.qq.com/api/get_group_info_ext2"
+    url += "?gcode=#{group_code}&cb=undefined&vfwebqq=#{vfwebqq}&t=#{new Date().getTime()}"
+    http_get {url:url}, (ret,e)->
+        callback(ret,e)
+    
+    
+
+# 
+# retcode
+exports.send_message2user = (to_uin , msg , clientid, psessionid ,callback)->
+    msg_id = 1000001 #随机msgid
+    url = "http://d.web2.qq.com/channel/send_buddy_msg2"
+    jsonstr = JSON.stringify
+    r = 
+        to: to_uin
+        face: 0
+        msg_id: msg_id 
+        clientid: "#{clientid}"
+        psessionid: psessionid        
+        content: jsonstr ["#{msg}\n" , ["font", {name:"宋体", size:"10", style:[0,0,0], color:"000000" }] ]
+            # "[\"#{msg}\\n\",[\"font\",{\"name\":\"宋体\",\"size\":\"10\",\"style\":[0,0,0],\”color\”:\”000000\”}]]”    
+        
+    params = 
+        r: jsonstr r
+        clientid: clientid
+        psessionid: psessionid
+
+    # log params
+    http_post {url:url} , params , (ret,e) ->
+        callback( ret , e )
+    
+    
