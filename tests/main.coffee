@@ -2,8 +2,8 @@
 
 int = (v) -> parseInt v
 log = console.log
-auth = require("../src/qqauth")
-
+auth = require "../src/qqauth"
+api  = require "../src/qqapi"
 
 log "testing..."
 
@@ -38,9 +38,6 @@ test_encode_password = ->
     
 #  需要验证码的登录
 test_encode_password2 = ->
-    # verify zkmm
-    # '4GJSgm18Bw-8yw5JGKpSOXH-0idqvaCU'
-    # \x00\x00\x00\x00\xa5\x13\xed\x18
     log auth.encode_password(pass,'zkmm','\\x00\\x00\\x00\\x00\\xa5\\x13\\xed\\x18')
     # should equal to F16B5C4EBE52641313403CB93C0FF569
 
@@ -57,8 +54,19 @@ test_login_full = ->
             log "开始登录2 cookie获取"
             auth.login_step2 ret[2] , (ret) ->                
                 log "开始登录3 token 获取"
-                auth.login_token (ret) ->
+                auth.login_token (ret,client_id) ->
+                    if ret.retcode == 0
+                        log "登录成功"
+                        log "psessionid:",ret.result.psessionid
+                        log "clientid:",client_id
+                        log "长轮训"
+                        api.cookies( auth.cookies() )
+                        api.long_poll client_id , ret.result.psessionid , (ret)->
+                            log ret
+                    else
+                        log "登录失败"    
                     log ret
+                    
 
     log "验证帐号..."
     auth.check_qq qq , (result) ->
@@ -92,6 +100,11 @@ test_login_token = ->
 test_get_verify_code = ->
     auth.get_verify_code qq, config.host, config.port, (error) ->
         log 'oh yeah'
+
+test_long_pull = ->
+    api.long_pull
+
+
 
 # test_check_qq()
 # test_encode_password2()
