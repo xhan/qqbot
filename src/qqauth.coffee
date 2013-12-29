@@ -51,10 +51,11 @@ exports.check_qq = (qq, callback) ->
 # 获取验证码
 # 记得call  finish_verify_code
 exports.get_verify_code = (qq , host, port, callback) ->
-    url = "https://ssl.captcha.qq.com/getimage?aid=1003903&r=0.2509327069195215&uin=#{qq}"
+    # url = "https://ssl.captcha.qq.com/getimage?aid=1003903&r=0.2509327069195215&uin=#{qq}"
+    url = "http://captcha.qq.com/getimage?aid=1003903&r=0.2509327069195215&uin=#{qq}"
     body = ''
     
-    https.get url , (resp) ->
+    http.get url , (resp) ->
         log "verify code: #{resp.statusCode}"
         # log resp.headers
         all_cookies = all_cookies.concat resp.headers['set-cookie']
