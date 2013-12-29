@@ -18,14 +18,17 @@ test_long_pull = ->
     uin        = api.defaults 'uin'
     vfwebqq    = api.defaults 'vfwebqq'
 
-    log 'psessionid',psessionid 
-    log 'client_id',client_id  
-    log 'ptwebqq',ptwebqq    
-    log 'uin',uin
-    log 'vfwebqq',vfwebqq
+    # log 'psessionid',psessionid 
+    # log 'client_id',client_id  
+    # log 'ptwebqq',ptwebqq    
+    # log 'uin',uin
+    # log 'vfwebqq',vfwebqq
     
-    log "长轮训"
-    api.long_poll client_id , psessionid , (ret)->
-        log ret
+    
+    api.send_message2user 2440652742, "你好啊" , client_id,psessionid, (ret,e)->
+        log "send ret:",ret
+    # log "长轮训"
+    # api.long_poll client_id , psessionid , (ret)->
+    #     log ret
     
 test_long_pull()    

@@ -112,6 +112,9 @@ after_logined = ->
     api.get_group_list vfwebqq, (ret , e)->
         log 'group',ret
     
+    # 86784314
+    api.get_group_member 86784314, vfwebqq , (ret,e)->
+        log 'group_member' , ret
 
 test_login_token = ->
     auth.post (ret) -> log ret
