@@ -58,10 +58,77 @@ ptui_checkVC('1','4GJSgm18Bw-8yw5JGKpSOXH-0idqvaCU','\x00\x00\x00\x00\xa5\x13\xe
 错误码 108 应该也是 cookie
 
 ``` json
-	{"retcode":0,"result":[{"poll_type":"message","value":{"msg_id":24225,"from_uin":2440652742,"to_uin":2769546520,"msg_id2":950054,"msg_type":9,"reply_ip":176498455,"time":1388368696,"content":[["font",{"size":13,"color":"004faa","style":[0,0,0],"name":"STKaiti"}],"hii "]}}]}
+{
+    "result": [
+        {
+            "poll_type": "message",
+            "value": {
+                "content": [
+                    [
+                        "font",
+                        {
+                            "color": "004faa",
+                            "name": "STKaiti",
+                            "size": 13,
+                            "style": [
+                                0,
+                                0,
+                                0
+                            ]
+                        }
+                    ],
+                    "hii "
+                ],
+                "from_uin": 2440652742,
+                "msg_id": 24225,
+                "msg_id2": 950054,
+                "msg_type": 9,
+                "reply_ip": 176498455,
+                "time": 1388368696,
+                "to_uin": 2769546520
+            }
+        }
+    ],
+    "retcode": 0
+}
 
-
-	{"retcode":0,"result":[{"poll_type":"group_message","value":{"msg_id":13663,"from_uin":2559225925,"to_uin":2769546520,"msg_id2":886022,"msg_type":43,"reply_ip":176756826,"group_code":3483368056,"send_uin":2440652742,"seq":27,"time":1388368698,"info_seq":346167134,"content":[["font",{"size":13,"color":"004faa","style":[0,0,0],"name":"STKaiti"}],"ooo "]}}]}
+{
+    "result": [
+        {
+            "poll_type": "group_message",
+            "value": {
+                "content": [
+                    [
+                        "font",
+                        {
+                            "color": "004faa",
+                            "name": "STKaiti",
+                            "size": 13,
+                            "style": [
+                                0,
+                                0,
+                                0
+                            ]
+                        }
+                    ],
+                    "ooo "
+                ],
+                "from_uin": 2559225925,
+                "group_code": 3483368056,
+                "info_seq": 346167134,
+                "msg_id": 13663,
+                "msg_id2": 886022,
+                "msg_type": 43,
+                "reply_ip": 176756826,
+                "send_uin": 2440652742,
+                "seq": 27,
+                "time": 1388368698,
+                "to_uin": 2769546520
+            }
+        }
+    ],
+    "retcode": 0
+}
 ```
 
 
