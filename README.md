@@ -8,10 +8,10 @@ QQBot
 * :muscle: 登录以及对验证码的支持
 * :muscle: 保持在线，注掉线后暂不能自动重新登录
 * :muscle: 发送消息（qq好友，群）
-*   监听派发收到的qq消息
-*   插件化
-*   支持hubot
-*   日志
+* :alien:  监听派发收到的qq消息
+* :alien:  插件化
+* :alien:  支持hubot
+* :alien:  日志
 
 关于
 ----
