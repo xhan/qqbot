@@ -30,22 +30,30 @@ auth_opts ={
     vfwebqq
 }
 
-bot = new QQBot("叫我小可爱")
+bot = new QQBot("叫我小可爱",auth_opts)
 
 api.get_buddy_list auth_opts, (ret,e)->
     log e  if e
-    log 'friend',ret
+    log 'friend',jsons ret
     log ''
     bot.save_buddy_info ret.result if ret.retcode == 0
     
 
 api.get_group_list auth_opts, (ret , e)->
     log e  if e
-    log 'group',ret
+    log 'group',jsons ret
     log ''
     bot.save_group_info ret.result if ret.retcode == 0
+    
+    # update group memeber
+    # qqbot群 
+    # NO 346167134
+    # BY 2769546520
+    bot.update_group_member({name:"qqbot群"})
+
     
 api.long_poll auth_opts, (ret,e)->
     log e if e
     log ret
     bot.handle_poll_responce(ret) 
+#     

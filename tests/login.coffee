@@ -6,7 +6,8 @@ int = (v) -> parseInt v
 log = console.log
 auth = require "../src/qqauth"
 api  = require "../src/qqapi"
-
+jsons = JSON.stringify
+    
 config = require '../config'
 qq = config.account 
 pass = config.password
@@ -114,7 +115,7 @@ after_logined = ->
     
     log "轮训"
     api.long_poll auth_opts  , (ret)->
-        log ret
+        log jsons ret
 
 
 test_login_token = ->
@@ -144,6 +145,6 @@ test_after_login = ->
 
 # test_get_list()
 
-test_login_full()
+# test_login_full()
 
-# test_after_login()
+test_after_login()
