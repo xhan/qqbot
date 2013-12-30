@@ -75,8 +75,25 @@ test4 =->
     log v.name
 
 
+test5 =->
+    #测试 npm依赖 能否互相 同层级调用
+    # ln -s ../../hubot-qq . 调用了 yaml
+    test = require 'hubot-qq'
+    log test
     
-test2()
+    
+test6 =->
+    #测试 export.xx 在包内如何获取
+    exports.xx =-> log "xxxxx"
+    exports.xx()
+    
+test7 =->
+    # 回调中缩进 似乎可以和父保持一直
+    log "hello"    
+    setTimeout ->
+    log "next"
+    ,300
+test7()
 
 # setTimeout ->
 #     log 'test'
