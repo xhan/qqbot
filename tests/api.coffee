@@ -19,12 +19,14 @@ test_api = ->
     uin        = api.defaults 'uin'
     vfwebqq    = api.defaults 'vfwebqq'
 
-    auth_opts =
-        psessionid:psessionid
-        clientid:  clientid
-        ptwebqq:   ptwebqq
-        uin:       uin
-        vfwebqq:   vfwebqq
+    auth_opts ={
+        psessionid
+        clientid
+        ptwebqq
+        uin
+        vfwebqq
+    }
+
         
     # log 'psessionid',psessionid 
     # log 'client_id',client_id  
@@ -51,7 +53,7 @@ test_api = ->
     # api.send_msg_2buddy 2440652742, "你好啊" , auth_opts, (ret,e)->
     #     log "buddy send ret:",ret
     
-    api.send_msg_2group 2559225925, "哈哈哈哈 没错啊" , auth_opts, (ret,e)->
+    api.send_msg_2group 2559225925, "系统提示：xxx" , auth_opts, (ret,e)->
         log "group send ret:",ret
         
     # log "长轮训"
