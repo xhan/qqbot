@@ -4,11 +4,18 @@ api.defaults_read()
 log = console.log
 jsons = JSON.stringify
 
+# 名字起得太差了
+Plugin = require './qqplugin'
+config = require '../config'
+plugin = new Plugin(config.plugins,config.listen)
+
+
 class QQBot
     constructor: (@name ,@auth) ->
         @buddy_info = {}
         @group_info = {}
         @groupmember_info = {}
+        
         
     
     # @format PROTOCOL `用户分组信息格式`
@@ -44,6 +51,7 @@ class QQBot
                 return item[key] == value
         groups.pop()
     
+    # 更新群成员， 似乎获取不到群ID
     # @options {key:value} 
     # @callback (true/false , error)
     update_group_member: (options, callback)->
@@ -52,7 +60,20 @@ class QQBot
             if ret.retcode == 0
                 @save_group_member(group,ret.result)
             callback(ret.retcode == 0 , e) if callback
-         
+    
+    # 回复消息
+    # @param message 收到的message
+    # @param content:string 回复信息
+    # @callback ret, error
+    reply_message: (message, content, callback)->
+        if message.type == 'group'
+            api.send_msg_2group  message.from_gid , content , @auth, (ret,e)->
+                callback(ret,e) if callback
+        else if message.type == 'buddy'            
+            api.send_msg_2buddy message.from_uin , content , @auth , (ret,e)->
+                callback(ret,e) if callback
+    
+    # 处理poll返回的内容
     handle_poll_responce: (resp)->
         code = resp.retcode
         return if code != 0
@@ -61,17 +82,23 @@ class QQBot
         
     _handle_poll_event : (event) ->
         switch event.poll_type
-          when 'group_message' then @_on_group_message(event)
+          when 'group_message' then @_on_message(event)
           when 'message'       then @_on_message(event)
           else log "unimplemented event",event.poll_type
         
     _on_message : (event)->
         msg = @_create_message event
-        log "[好友消息]","#{msg.from_user.nick}:#{msg.content} #{msg.time}"
+        if msg.type == 'group'
+            log "[群消息]","[#{msg.from_group.name}] #{msg.from_user.nick}:#{msg.content} #{msg.time}"
+        else if msg.type == 'buddy'
+            log "[好友消息]","#{msg.from_user.nick}:#{msg.content} #{msg.time}"
         
-    _on_group_message : (event)->
-        msg = @_create_message event
-        log "[群消息]","[#{msg.from_group.name}] #{msg.from_user.nick}:#{msg.content} #{msg.time}"
+        # 消息处理 ，只操作群
+        # if msg.type == 'group'
+        plugin.dispatch(@, msg)
+            
+        
+        
     
     _create_message : (event)->
         value = event.value
