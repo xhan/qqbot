@@ -1,5 +1,5 @@
 {
-  "name": "qqbot",
+  "name": "hubot-qq",
   "version": "1.0.0",
 
   "author": "xhan",
@@ -7,10 +7,10 @@
   "keywords": [
     "qqbot",
     "hubot",
-    "bot"
+    "robot"
   ],
 
-  "description": "A robot lives on webQQ",
+  "description": "QQ adapter for Hubot, and also A dependence robot lives on webQQ",
 
   "licenses": [{
     "type": "MIT",
@@ -36,9 +36,6 @@
     "npm":  ">= 1.1.x"
   },
 
-  "main": "./index",
+  "main": "./src/hubot-qq"
 
-  "bin": {
-    "hubot": "./bin/hubot"
-  }
 }
