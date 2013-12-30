@@ -31,9 +31,18 @@ test1 = ->
         log i , v
 
 test2 = ->
-    for i,v of [10,2,3]
-        log i,v
-
+    # 官方的解释 大概 
+    # for in 用在 array
+    # for of 用在 obj
+    
+    # 测试 for of / for in
+    # for i,v in [10,2,3]
+    #     log i,v
+    log v for v in [10,2,3]
+    
+    # log "kk"
+    log k,v for k,v of {a:10,b:20}
+        # log k,v
 
 test3 =->
     QQBot = require '../src/qqbot'
@@ -67,7 +76,7 @@ test4 =->
 
 
     
-test4()
+test2()
 
 # setTimeout ->
 #     log 'test'

@@ -78,9 +78,8 @@ class QQBot
     # 处理poll返回的内容
     handle_poll_responce: (resp)->
         code = resp.retcode
-        return if code != 0
-        for idx,event of resp.result
-            @_handle_poll_event(event)
+        return if code != 0        
+        @_handle_poll_event(event) for event in resp.result
         
     _handle_poll_event : (event) ->
         switch event.poll_type
