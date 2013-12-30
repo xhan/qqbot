@@ -6,8 +6,10 @@ class QQPlugin extends EventEmitter
         for i, plugin_name of @plugins
             @listeners.push require "../plugins/#{plugin_name}"
     
-    dispatch: (robot,message)->
+    dispatch: (content ,send, robot, message)->
         for i, plugin of @listeners
-            plugin( robot , message)
+            plugin(content ,send, robot, message)
             
-module.exports = QQPlugin             
+    
+            
+module.exports = QQPlugin
