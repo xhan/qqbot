@@ -15,7 +15,7 @@ class QQBot
         @buddy_info = {}
         @group_info = {}
         @groupmember_info = {}
-        
+        @plugin_control = plugin
         
     
     # @format PROTOCOL `用户分组信息格式`
@@ -66,12 +66,14 @@ class QQBot
     # @param content:string 回复信息
     # @callback ret, error
     reply_message: (message, content, callback)->
+        log "发送消息：",content
         if message.type == 'group'
             api.send_msg_2group  message.from_gid , content , @auth, (ret,e)->
                 callback(ret,e) if callback
         else if message.type == 'buddy'            
             api.send_msg_2buddy message.from_uin , content , @auth , (ret,e)->
-                callback(ret,e) if callback
+                callback(ret,e) if callback    
+    
     
     # 处理poll返回的内容
     handle_poll_responce: (resp)->
@@ -95,7 +97,14 @@ class QQBot
         
         # 消息处理 ，只操作群
         # if msg.type == 'group'
-        plugin.dispatch(@, msg)
+        
+        content = msg.content.trim()
+        replied = false
+        reply = (content)=>
+            @reply_message(msg,content) unless replied
+            replied = true
+            
+        @plugin_control.dispatch(content ,reply, @ , msg)
             
         
         
