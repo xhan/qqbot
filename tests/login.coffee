@@ -1,5 +1,7 @@
 #!/usr/bin/env coffee
 
+# 登录相关的测试代码
+
 int = (v) -> parseInt v
 log = console.log
 auth = require "../src/qqauth"
@@ -123,7 +125,6 @@ test_login_token = ->
 test_get_verify_code = ->
     auth.get_verify_code qq, config.host, config.port, (error) ->
         log 'oh yeah'
-
 
 
 test_after_login = ->
