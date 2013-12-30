@@ -1,13 +1,15 @@
 {
   "name": "hubot-qq",
-  "version": "1.0.0",
+  "version": "1.0.1",
 
   "author": "xhan",
 
   "keywords": [
     "qqbot",
     "hubot",
-    "robot"
+    "robot",
+    "qq",
+    "webqq"
   ],
 
   "description": "QQ adapter for Hubot, and also A dependence robot lives on webQQ",
@@ -23,16 +25,13 @@
   },
 
   "dependencies": {
-    "coffee-script":      ">= 1.6.3",
-    "optparse":           ">= 1.0.4",
     "scoped-http-client": ">= 0.9.8",
     "log":                ">= 1.4.0",
-    "express":            ">= 3.3.4",
-    "js-yaml" :"*"
+    "js-yaml" :           ">= 3.0.0"
   },
 
   "engines": {
-    "node": ">= 0.8.x",
+    "node": ">= 0.10.x",
     "npm":  ">= 1.1.x"
   },
 
