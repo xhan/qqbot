@@ -1,17 +1,17 @@
 QQBot
 -----
-使用非公开协议(web.qq.com)的QQ机器人。命令行工具，由不可思议的CoffeeScript提供支持。
+使用[非公开协议WebQQ](https://github.com/xhan/qqbot/blob/master/protocol.md)的QQ机器人。命令行工具，由不可思议的CoffeeScript提供支持。
 
 状态
 -----
-* [x] 可行性测试
-* [x] 登录以及对验证码的支持
-* [x] 保持在线，注掉线后暂不能自动重新登录
-* [x] 发送消息（qq好友，群）
-* []  监听派发收到的qq消息
-* []  插件化
-* []  支持hubot
-* []  日志
+* :muscle: 可行性测试
+* :muscle: 登录以及对验证码的支持
+* :muscle: 保持在线，注掉线后暂不能自动重新登录
+* :muscle: 发送消息（qq好友，群）
+*   监听派发收到的qq消息
+*   插件化
+*   支持hubot
+*   日志
 
 关于
 ----
