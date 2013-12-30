@@ -61,9 +61,9 @@ test4 =->
             log "test2"
             test()
             
-    v = new OOO('vvv')
+    v = new OOO('名字')
     v.ask2()
-
+    log v.name
 
 
     
