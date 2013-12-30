@@ -125,8 +125,7 @@ exports.get_group_member = (group_code, auth_opts, callback)->
     url = "http://s.web2.qq.com/api/get_group_info_ext2"
     url += "?gcode=#{group_code}&cb=undefined&vfwebqq=#{auth_opts.vfwebqq}&t=#{new Date().getTime()}"
     client.get {url:url}, (ret,e)->
-        ret = jsons ret if ret
-        callback(jsons ret,e)    
+        callback(ret,e)
     
 
 #  @param to_uin: uin
