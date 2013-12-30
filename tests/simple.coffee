@@ -43,6 +43,7 @@ test3 =->
 
 test4 =->
     # 没法在 =-> 方法中调用 @方法
+    # 在callback 里调用方法需要用 =>
     class OOO
         constructor:(@name)->
         ask:->
@@ -52,7 +53,9 @@ test4 =->
             log "test"
         ask2:->
             log "ask2"
-            @ask()
+            setTimeout =>
+                @ask()
+            ,500
             # test2()
         test2 = ->
             log "test2"
@@ -60,5 +63,13 @@ test4 =->
             
     v = new OOO('vvv')
     v.ask2()
+
+
+
     
 test4()
+
+# setTimeout ->
+#     log 'test'
+# ,500
+    
