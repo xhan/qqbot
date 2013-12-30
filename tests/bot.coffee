@@ -54,6 +54,6 @@ api.get_group_list auth_opts, (ret , e)->
     
 api.long_poll auth_opts, (ret,e)->
     log e if e
-    log ret
+    log jsons ret
     bot.handle_poll_responce(ret) 
-#     
+
