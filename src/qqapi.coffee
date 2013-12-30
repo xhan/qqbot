@@ -6,6 +6,7 @@ Url = require('url')
 all_cookies = []
 defaults    = {}
 fs = require 'fs'
+jsons = JSON.stringify
 
 md5 = (str) ->
     md5sum = crypto.createHash 'md5'
@@ -28,7 +29,7 @@ exports.defaults = (key,value)->
 
 exports.defaults_save = ->
     defaults.cookie = all_cookies
-    fs.writeFileSync 'tmp/store.json' ,  JSON.stringify(defaults)
+    fs.writeFileSync 'tmp/store.json' ,  jsons(defaults)
 
 exports.defaults_read = ->
     try
@@ -50,12 +51,11 @@ long_poll = (client_id, psessionid, callback) ->
         psessionid: psessionid
         key:0
         ids:[]
-    r = JSON.stringify(r)
     
     data = querystring.stringify {
         clientid: client_id,
         psessionid: psessionid,
-        r: r
+        r: jsons r
     }
         
     body = ''
@@ -158,9 +158,8 @@ exports.get_friend_list = (uin, ptwebqq, vfwebqq, callback)->
       h: "hello"
       hash: hash_func(uin, ptwebqq)
       vfwebqq: vfwebqq
-    r = JSON.stringify(r)
 
-    http_post {url:aurl} , {r:r} , (ret,e )->
+    http_post {url:aurl} , {r:jsons(r)} , (ret,e )->
         callback(ret,e)
 
 
@@ -187,28 +186,50 @@ exports.get_group_member = (group_code, vfwebqq, callback)->
     
     
 
-# 
-# retcode
-exports.send_message2user = (to_uin , msg , clientid, psessionid ,callback)->
-    msg_id = 1000001 #随机msgid
-    url = "http://d.web2.qq.com/channel/send_buddy_msg2"
-    jsonstr = JSON.stringify
+#  @param to_uin: uin
+#  @param msg, 消息
+#  @param auth_opts: [clientid,psessionid]
+#  @param callback: ret, e
+#  @return ret retcode 0    
+exports.send_msg_2buddy = (to_uin , msg , auth_opts ,callback)->    
+    url = "http://d.web2.qq.com/channel/send_buddy_msg2"    
+    opt = auth_opts
     r = 
-        to: to_uin
-        face: 0
-        msg_id: msg_id 
-        clientid: "#{clientid}"
-        psessionid: psessionid        
-        content: jsonstr ["#{msg}\n" , ["font", {name:"宋体", size:"10", style:[0,0,0], color:"000000" }] ]
-            # "[\"#{msg}\\n\",[\"font\",{\"name\":\"宋体\",\"size\":\"10\",\"style\":[0,0,0],\”color\”:\”000000\”}]]”    
+      to: to_uin
+      face: 0
+      msg_id: 1000001 #随机msgid
+      clientid: "#{opt.clientid}"
+      psessionid: opt.psessionid        
+      content: jsons ["#{msg}" , ["font", {name:"宋体", size:"10", style:[0,0,0], color:"000000" }] ]
         
     params = 
-        r: jsonstr r
-        clientid: clientid
-        psessionid: psessionid
+        r: jsons r
+        clientid: opt.clientid
+        psessionid: opt.psessionid
 
     # log params
     http_post {url:url} , params , (ret,e) ->
         callback( ret , e )
     
+#  @param group_code: gid
+#  @param msg, 消息
+#  @param auth_opts: [clientid,psessionid]
+#  @param callback: ret, e
+#  @return ret retcode 0    
+exports.send_msg_2group = (group_code, msg , auth_opts, callback)->
+    url = 'http://d.web2.qq.com/channel/send_qun_msg2'
+    opt = auth_opts
+    r = 
+      group_uin:  group_code
+      msg_id:     1000001   #随机msgid
+      clientid:   "#{opt.clientid}"
+      psessionid: opt.psessionid
+      content:    jsons ["#{msg}" , ["font", {name:"宋体", size:"10", style:[0,0,0], color:"000000" }] ]
+    params =
+        r:         jsons r
+        clientid:  opt.clientid
+        psessionid:opt.psessionid
+    http_post {url:url} , params , (ret,e)->
+        callback(ret,e)
+        
     
