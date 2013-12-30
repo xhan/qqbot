@@ -153,16 +153,16 @@ exports.send_msg_2buddy = (to_uin , msg , auth_opts ,callback)->
     client.post {url:url} , params , (ret,e) ->
         callback( ret , e )
     
-#  @param group_code: gid
+#  @param gid: gid
 #  @param msg, 消息
 #  @param auth_opts: [clientid,psessionid]
 #  @param callback: ret, e
 #  @return ret retcode 0    
-exports.send_msg_2group = (group_code, msg , auth_opts, callback)->
+exports.send_msg_2group = (gid, msg , auth_opts, callback)->
     url = 'http://d.web2.qq.com/channel/send_qun_msg2'
     opt = auth_opts
     r = 
-      group_uin:  group_code
+      group_uin:  gid
       msg_id:     1000001   #随机msgid
       clientid:   "#{opt.clientid}"
       psessionid: opt.psessionid
