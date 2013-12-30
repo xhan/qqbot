@@ -1,3 +1,19 @@
 # rename this file to config.yaml before start
 account:  123774072
 password: password
+
+# 验证码图片
+port: 3000
+host: localhost
+
+# 机器人响应名字
+botname: 'bot' 
+
+plugins:
+    - version
+    # - help
+
+# all, none, [values]
+listen:
+    buddy: all    
+    group: all
