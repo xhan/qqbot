@@ -99,24 +99,23 @@ login_next = (qq , encoded_pass , verify_code)->
 after_logined = ->
     
     psessionid = api.defaults 'psessionid' 
-    client_id  = api.defaults 'clientid'   
+    clientid  = api.defaults 'clientid'   
     ptwebqq    = api.defaults 'ptwebqq'    
     uin        = api.defaults 'uin'
     vfwebqq    = api.defaults 'vfwebqq'
     
-
-    api.long_poll client_id , psessionid , (ret)->
+    auth_opts ={
+        psessionid
+        clientid
+        ptwebqq
+        uin
+        vfwebqq
+    }
+    
+    log "轮训"
+    api.long_poll auth_opts  , (ret)->
         log ret
-    
-    api.get_friend_list uin, ptwebqq, vfwebqq, (ret,e)->
-        log 'friend',ret
-    
-    api.get_group_list vfwebqq, (ret , e)->
-        log 'group',ret
-    
-    # 86784314
-    api.get_group_member 86784314, vfwebqq , (ret,e)->
-        log 'group_member' , ret
+
 
 test_login_token = ->
     auth.post (ret) -> log ret
