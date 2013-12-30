@@ -1,5 +1,5 @@
 #!/usr/bin/env coffee
-
+log = console.log
 prompt = (title, callback) ->
     process.stdin.resume()
     process.stdout.write(title)
@@ -12,12 +12,23 @@ prompt = (title, callback) ->
       callback()
 
 
-log = console.log
-log "hello"
+test_prompt = ->
+    log "hello"
+    prompt "input something", (content)->
+        log content
 
-prompt "input something", (content)->
-    log content
+    log "end"
+    
 
-log "end"
+
+log 'begin'
+k = 
+    a:10
+    b:20
+    c:30
+
+for i,v of k
+    log i , v
+    
 
 
