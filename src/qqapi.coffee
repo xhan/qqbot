@@ -16,8 +16,10 @@ md5 = (str) ->
 # TODO: logger 分级控制
 log   = console.log
 
-exports.cookies = (cookie)->
-    all_cookies = cookie if cookie
+exports.cookies = (cookie)->    
+    if cookie
+        all_cookies = cookie 
+        client.global_cookies(all_cookies)
     return all_cookies
 
 exports.defaults = (key,value)-> 
@@ -36,7 +38,6 @@ exports.defaults_read = ->
     try
         defaults = JSON.parse( fs.readFileSync  'tmp/store.json' )
         all_cookies  = defaults.cookie
-        # 设置httpclient cookie
         client.global_cookies(all_cookies)
     catch error
         log error        
