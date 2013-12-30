@@ -2,6 +2,10 @@ https = require "https"
 http  = require 'http'
 querystring  = require 'querystring'
 URL  = require('url')
+jsons = JSON.stringify
+
+# 剥离出来的 HttpClient ，目前仅适合 qqapi 使用
+# 返回值：已经解析的json
 
 
 # 设置全局cookie
@@ -31,15 +35,25 @@ http_request = (options , params , callback) ->
         resp.on 'data', (chunk) ->
             body += chunk
         resp.on 'end', ->
-            callback( body )
-    req.on "error" , (e)->
+            handle_resp_body(body, callback)
+    req.on "error" , (e)->        
         callback(null,e)
         
     if params and options.method == 'POST'
-        # log data
         req.write(data);
     req.end();
 
+handle_resp_body = (body , callback) ->
+    err = null
+    try
+        ret = JSON.parse body        
+    catch error
+        console.log "解析出错",body
+        console.log error
+        err = error
+        ret = null
+    callback(ret,err)
+    
 
 http_get  = (options , callback) ->
     options.method = 'GET'
