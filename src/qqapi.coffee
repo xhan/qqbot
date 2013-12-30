@@ -88,43 +88,45 @@ function(b, i) {
 }
 `
 
+
 #  @param uin     : 登录后获得
 #  @param ptwebqq : cookie
 #  @param vfwebqq : 登录后获得
 #  @param callback: ret, e
 #  retcode 0
-exports.get_friend_list = (uin, ptwebqq, vfwebqq, callback)->
-    aurl = "http://s.web2.qq.com/api/get_user_friends2"
+exports.get_buddy_list = (auth_opts, callback)->
+    opt = auth_opts
+    url = "http://s.web2.qq.com/api/get_user_friends2"
     r = 
       h: "hello"
-      hash: hash_func(uin, ptwebqq)
-      vfwebqq: vfwebqq
+      hash: hash_func(opt.uin, opt.ptwebqq)
+      vfwebqq: opt.vfwebqq
 
-    client.post {url:aurl} , {r:jsons(r)} , (ret,e )->
+    client.post {url:url} , {r:jsons(r)} , (ret,e )->
         callback(ret,e)
 
 
-#  @param vfwebqq : 登录后获得
+#  @param auth_opts vfwebqq : 登录后获得
 #  @param callback: ret, e
 #  retcode 0
-exports.get_group_list = ( vfwebqq, callback)->
+exports.get_group_list = ( auth_opts, callback)->
     aurl = "http://s.web2.qq.com/api/get_group_name_list_mask2"    
-    r    = vfwebqq:  vfwebqq     
-    r    = JSON.stringify r
+    r    = vfwebqq:  auth_opts.vfwebqq
     
-    client.post {url:aurl} , {r:r} , (ret,e )->
-        callback(ret,e)
+    client.post {url:aurl} , {r:jsons(r)} , (ret, e )->
+            callback(ret,e) 
+
 
 #  @param group_code: code
-#  @param vfwebqq : 登录后获得
+#  @param auth_opts vfwebqq : 登录后获得
 #  @param callback: ret, e
 #  retcode 0
-exports.get_group_member = (group_code, vfwebqq, callback)->
+exports.get_group_member = (group_code, auth_opts, callback)->
     url = "http://s.web2.qq.com/api/get_group_info_ext2"
-    url += "?gcode=#{group_code}&cb=undefined&vfwebqq=#{vfwebqq}&t=#{new Date().getTime()}"
+    url += "?gcode=#{group_code}&cb=undefined&vfwebqq=#{auth_opts.vfwebqq}&t=#{new Date().getTime()}"
     client.get {url:url}, (ret,e)->
-        callback(ret,e)
-    
+        ret = jsons ret if ret
+        callback(jsons ret,e)    
     
 
 #  @param to_uin: uin
