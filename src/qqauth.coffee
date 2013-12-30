@@ -4,13 +4,16 @@ crypto = require 'crypto'
 querystring  = require 'querystring'
 Url = require('url')
 all_cookies = []
+int = (v) -> parseInt v
+
+Log = require 'log'
+log = new Log('debug');
 
 md5 = (str) ->
     md5sum = crypto.createHash 'md5'
     md5sum.update(str).digest('hex')
 
-# TODO: logger 分级控制
-log   = console.log
+
 
 
 exports.cookies = ->
@@ -32,7 +35,6 @@ exports.check_qq = (qq, callback) ->
     body = '';
     https
         .get options  , (resp) ->
-            # log "response: #{resp.statusCode}"
             all_cookies = resp.headers['set-cookie']
             resp.on 'data', (chunk) ->
                 body += chunk;
@@ -45,7 +47,7 @@ exports.check_qq = (qq, callback) ->
                 callback( ret )
             
         .on "error", (e) ->
-              log e
+              log.error e
               
 
 # 获取验证码
@@ -56,7 +58,7 @@ exports.get_verify_code = (qq , host, port, callback) ->
     body = ''
     
     http.get url , (resp) ->
-        log "verify code: #{resp.statusCode}"
+        # log "verify code: #{resp.statusCode}"
         # log resp.headers
         all_cookies = all_cookies.concat resp.headers['set-cookie']
         resp.setEncoding 'binary'
@@ -66,7 +68,7 @@ exports.get_verify_code = (qq , host, port, callback) ->
             create_img_server(host,port,body,resp.headers)            
             callback()
     .on "error", (e) ->
-       log e
+       log.error e
        callback(e)
 
 exports.finish_verify_code = -> stop_img_server()
@@ -116,7 +118,7 @@ exports.encode_password = (password , token , bits) ->
 
 
 # 登录 帐号密码验证码 校验
-exports.login = (qq, encode_password, verifycode , callback) ->
+exports.login_step1 = (qq, encode_password, verifycode , callback) ->
     path = "/login?u=#{qq}&p=#{encode_password}&verifycode=#{verifycode}&webqq_type=10&remember_uin=1&login2qq=1&aid=1003903&u1=http%3A%2F%2Fweb2.qq.com%2Floginproxy.html%3Flogin2qq%3D1%26webqq_type%3D10&h=1&ptredirect=0&ptlang=2052&daid=164&from_ui=1&pttype=1&dumy=&fp=loginerroralert&action=3-15-72115&mibao_css=m_webqq&t=1&g=1&js_type=0&js_ver=10062&login_sig=qBpuWCs9dlR9awKKmzdRhV8TZ8MfupdXF6zyHmnGUaEzun0bobwOhMh6m7FQjvWA"
     options = 
         host: 'ssl.ptlogin2.qq.com'
@@ -141,8 +143,26 @@ exports.login = (qq, encode_password, verifycode , callback) ->
                 callback( ret )
             
         .on "error", (e) ->
-              log e
+              log.error e
 
+# 验证成功后继续获取cookie
+exports.login_step2 = (url, callback) ->
+    url = Url.parse(url)
+    options = 
+        host: url.host
+        path: url.path
+        headers:
+            'Cookie' : all_cookies
+
+    body = '';
+    http
+        .get options  , (resp) ->
+            log.debug "response: #{resp.statusCode}"
+            all_cookies = all_cookies.concat resp.headers['set-cookie']
+            callback( true )
+            # 只需要获取cookie
+        .on "error", (e) ->
+              log.error e
 
 # "http://d.web2.qq.com/channel/login2"
 #  callback( ret , client_id , ptwebqq)
@@ -180,7 +200,7 @@ exports.login_token = (callback) ->
             'Cookie' : all_cookies
     
     req = http.request options, (resp) ->
-        log "login token response: #{resp.statusCode}"
+        log.debug "login token response: #{resp.statusCode}"
         resp.on 'data', (chunk) ->
             body += chunk
         resp.on 'end', ->
@@ -190,46 +210,83 @@ exports.login_token = (callback) ->
     req.write(data);
     req.end();
 
-# 验证成功后继续获取cookie
-exports.login_step2 = (url, callback) ->
-    url = Url.parse(url)
-    options = 
-        host: url.host
-        path: url.path
-        headers:
-            'Cookie' : all_cookies
+###
+    全局登录函数，如果有验证码会建立一个 http-server ，同时写入 tmp/t.jpg (osx + open. 操作)
+    http-server 的端口和显示地址可配置    
+    @param options {account,password,port,host}
+    @callback( cookies , auth_options ) if login success
+###    
+exports.login = (options, callback) ->    
+    [auth,opt] = [exports,options]
+    [qq,pass] = [opt.account,opt.password]
+    
+    log.info '登录 step0 验证码检测'
+    auth.check_qq qq , (result) ->
+      log.debug "验证帐号:", result
+      [need_verify,verifycode,bits] = result
+      if int need_verify
+        log.info "登录 step0.5 获取验证码"
+        auth.get_verify_code qq, opt.host, opt.port, (error) ->
+          # open image folder
+          require('child_process').exec 'open tmp' if process.platform is 'darwin'
+                
+          log.notice "打开该地址->", "http://#{opt.host}:#{opt.port}"
+          auth.prompt "输入验证码:" , (code) ->
+              auth.finish_verify_code()
+              verify_code  = code
+              log.notice '验证码：' , verify_code
+              pass_encrypted = auth.encode_password(pass, verify_code , bits)
+              login_next( qq , pass_encrypted , verify_code , callback)
+      else
+        log.info "- 无需验证码"
+        pass_encrypted= auth.encode_password(pass, verify_code , bits)
+        login_next( qq , pass_encrypted , verify_code , callback)
 
-    body = '';
-    http
-        .get options  , (resp) ->
-            log "response: #{resp.statusCode}"
-            all_cookies = all_cookies.concat resp.headers['set-cookie']
-            callback( true )
-            # 只需要获取cookie
-        .on "error", (e) ->
-              log e
+# login 函数的步骤2
+#  TODO:各种回调的 error 处理
+login_next = (account , pass_encrypted , verify_code , callback)->
+  auth = exports
+  log.info "登录 step1 密码校验"
+  auth.login_step1 account, pass_encrypted , verify_code , (ret)->
+    
+    if not ret[2].match /^http/
+      log.error "登录 step1 failed", ret
+      return
+    
+    log.info "登录 step2 cookie获取"
+    auth.login_step2 ret[2] , (ret) ->
+      log.info "登录 step3 token 获取"
+      auth.login_token (ret,client_id,ptwebqq) ->
+        if ret.retcode == 0          
+            log.info '登录成功',account
+            
+            auth_options =
+              psessionid: ret.result.psessionid
+              clientid  : client_id
+              ptwebqq   : ptwebqq
+              uin       : ret.result.uin
+              vfwebqq   : ret.result.vfwebqq
+              
+            callback( all_cookies, auth_options)
 
-exports.post = (callback) ->
-    data = 'clientid=15808069&psessionid=null&r=%7B%22status%22%3A%22online%22%2C%22ptwebqq%22%3A%223d1965f179ab2889b44d4f04636fbf821925d33b22ca4563f57432b5717d0320%22%2C%22passwd_sig%22%3A%22%22%2C%22clientid%22%3A%2215808069%22%2C%22psessionid%22%3Anull%7D'
-    cookie = "uin=o0123774072;  skey=@sml50B743;  p_skey=FZCPaiT2bIugMhij1wNAvy6m-XieWh7M2Ax3O*mzRi8_; "
-    body = ''
-    options = 
-        host: 'd.web2.qq.com',
-        path: '/channel/login2',
-        method: 'POST',
-        headers: 
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:27.0) Gecko/20100101 Firefox/27.0',
-            'Referer': 'http://d.web2.qq.com/proxy.html?v=20110331002&callback=1&id=3',
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-            'Content-Length': Buffer.byteLength(data),
-            'Cookie' : cookie 
-    req = http.request options, (resp) ->
-        log "response: #{resp.statusCode}"
-        resp.on 'data', (chunk) ->
-            body += chunk
-        resp.on 'end', ->
-            ret = JSON.parse(body)
-            callback( ret )
+        else
+          log.info "登录失败"    
+          log.error ret
                     
-    req.write(data);
-    req.end();
+
+# prompt user to input something
+# @param title : prompt title
+# @callback(content)
+exports.prompt = (title, callback) ->
+    process.stdin.resume()
+    process.stdout.write(title)
+    process.stdin.on "data",  (data) ->
+        data = data.toString().trim()
+        # 过滤无效内容
+        if data
+            callback data 
+            process.stdin.pause()
+    # control + d to end 
+    process.stdin.on 'end', ->
+      process.stdout.write('end')
+      callback()                    

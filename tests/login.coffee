@@ -70,7 +70,7 @@ test_login_full = ->
 
 login_next = (qq , encoded_pass , verify_code)->
     log "开始登录1 密码校验"
-    auth.login qq, encoded_pass , verify_code , (ret)->
+    auth.login_step1 qq, encoded_pass , verify_code , (ret)->
         log '登录结果'
         log ret
         return unless ret[2].match /^http/
@@ -132,7 +132,11 @@ test_after_login = ->
     after_logined()
 
     
-
+test_login_on_authmodule = ->
+    auth.login config , (cookies,auth_info)->
+        api.cookies( cookies )
+        api.long_poll auth_info , (ret)->
+            log jsons ret
 
 
 
@@ -147,4 +151,7 @@ test_after_login = ->
 
 # test_login_full()
 
-test_after_login()
+# test_after_login()
+
+
+test_login_on_authmodule()
