@@ -7,6 +7,7 @@ all_cookies = []
 defaults    = {}
 fs = require 'fs'
 jsons = JSON.stringify
+client = require './httpclient'
 
 md5 = (str) ->
     md5sum = crypto.createHash 'md5'
@@ -35,6 +36,8 @@ exports.defaults_read = ->
     try
         defaults = JSON.parse( fs.readFileSync  'tmp/store.json' )
         all_cookies  = defaults.cookie
+        # 设置httpclient cookie
+        client.global_cookies(all_cookies)
     catch error
         log error        
 
@@ -107,45 +110,7 @@ function(b, i) {
                 return d
 }
 `
-# callback(ret , error)
-http_request = (options , params , callback) ->
-    aurl = Url.parse( options.url )
-    options.host = aurl.host
-    options.path = aurl.path
-    options.headers ||= {} 
-    
-    client =  if aurl.protocol == 'https:' then https else http
-    body = ''
-    if params and options.method == 'POST'
-        data = querystring.stringify params
-        options.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8'
-        options.headers['Content-Length']= Buffer.byteLength(data)
-        
-    options.headers['Cookie'] = all_cookies
-    options.headers['Referer'] = 'http://d.web2.qq.com/proxy.html?v=20110331002&callback=1&id=3'
-    
-    req = client.request options, (resp) ->
-        # log "response: #{resp.statusCode}"
-        resp.on 'data', (chunk) ->
-            body += chunk
-        resp.on 'end', ->
-            callback( body )
-    req.on "error" , (e)->
-        callback(null,e)
-        
-    if params and options.method == 'POST'
-        # log data
-        req.write(data);
-    req.end();
 
-
-http_get  = (options , callback) ->
-    options.method = 'GET'
-    http_request( options , null , callback)
-    
-http_post = (options , body, callback) ->
-    options.method = 'POST'
-    http_request( options , body , callback)
 
 #  @param uin     : 登录后获得
 #  @param ptwebqq : cookie
@@ -159,7 +124,7 @@ exports.get_friend_list = (uin, ptwebqq, vfwebqq, callback)->
       hash: hash_func(uin, ptwebqq)
       vfwebqq: vfwebqq
 
-    http_post {url:aurl} , {r:jsons(r)} , (ret,e )->
+    client.post {url:aurl} , {r:jsons(r)} , (ret,e )->
         callback(ret,e)
 
 
@@ -171,7 +136,7 @@ exports.get_group_list = ( vfwebqq, callback)->
     r    = vfwebqq:  vfwebqq     
     r    = JSON.stringify r
     
-    http_post {url:aurl} , {r:r} , (ret,e )->
+    client.post {url:aurl} , {r:r} , (ret,e )->
         callback(ret,e)
 
 #  @param group_code: code
@@ -181,7 +146,7 @@ exports.get_group_list = ( vfwebqq, callback)->
 exports.get_group_member = (group_code, vfwebqq, callback)->
     url = "http://s.web2.qq.com/api/get_group_info_ext2"
     url += "?gcode=#{group_code}&cb=undefined&vfwebqq=#{vfwebqq}&t=#{new Date().getTime()}"
-    http_get {url:url}, (ret,e)->
+    client.get {url:url}, (ret,e)->
         callback(ret,e)
     
     
@@ -208,7 +173,7 @@ exports.send_msg_2buddy = (to_uin , msg , auth_opts ,callback)->
         psessionid: opt.psessionid
 
     # log params
-    http_post {url:url} , params , (ret,e) ->
+    client.post {url:url} , params , (ret,e) ->
         callback( ret , e )
     
 #  @param group_code: gid
@@ -229,7 +194,7 @@ exports.send_msg_2group = (group_code, msg , auth_opts, callback)->
         r:         jsons r
         clientid:  opt.clientid
         psessionid:opt.psessionid
-    http_post {url:url} , params , (ret,e)->
+    client.post {url:url} , params , (ret,e)->
         callback(ret,e)
         
     
