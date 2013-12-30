@@ -57,6 +57,12 @@ ptui_checkVC('1','4GJSgm18Bw-8yw5JGKpSOXH-0idqvaCU','\x00\x00\x00\x00\xa5\x13\xe
 -----
 错误码 108 应该也是 cookie
 
+``` json
+	{"retcode":0,"result":[{"poll_type":"message","value":{"msg_id":24225,"from_uin":2440652742,"to_uin":2769546520,"msg_id2":950054,"msg_type":9,"reply_ip":176498455,"time":1388368696,"content":[["font",{"size":13,"color":"004faa","style":[0,0,0],"name":"STKaiti"}],"hii "]}}]}
+
+
+	{"retcode":0,"result":[{"poll_type":"group_message","value":{"msg_id":13663,"from_uin":2559225925,"to_uin":2769546520,"msg_id2":886022,"msg_type":43,"reply_ip":176756826,"group_code":3483368056,"send_uin":2440652742,"seq":27,"time":1388368698,"info_seq":346167134,"content":[["font",{"size":13,"color":"004faa","style":[0,0,0],"name":"STKaiti"}],"ooo "]}}]}
+```
 
 
 7.获取用户，群分组
@@ -69,38 +75,63 @@ http://0.web.qstatic.com/webqqpic/pubapps/0/50/eqq.all.js  搜索 P=function
 
 
 
+用户分组信息格式
+``` json
+{
+        "categories": [
+            {
+                "index": 1,
+                "name": "Acquaintances",
+                "sort": 1
+            },
+            {
+                "index": 2,
+                "name": "Family",
+                "sort": 2
+            }
+        ],
+        "friends": [
+            {
+                "categories": 0,
+                "flag": 0,
+                "uin": 2440652742
+            }
+        ],
+        "info": [
+            {
+                "face": 0,
+                "flag": 25707010,
+                "nick": "\u547c\u5438 (\u7cd7\u767e)",
+                "uin": 2440652742
+            }
+        ],
+        "marknames": [],
+        "vipinfo": [
+            {
+                "is_vip": 0,
+                "u": 2440652742,
+                "vip_level": 0
+            }
+        ]
+}
 
+```
 
+群分组信息
 
+``` json
+{
+    "gmarklist": [],
+    "gmasklist": [],
+    "gnamelist": [
+        {
+            "code": 3483368056,
+            "flag": 1090519041,
+            "gid": 2559225925,
+            "name": "qqbot\u7fa4"
+        }
+    ]
+}
 
+```
 
-
-
-
-{"retcode":0,"result":{"uin":123774072,"cip":3698387524,"index":1075,"port":60213,"status":"online","vfwebqq":"ef219df9a83ccf1b694e1dda5d6bc354411858941b2560b312ed3124ce869b6982b0ec3229bb718b","psessionid":"8368046764001d636f6e6e7365727665725f77656271714031302e3133332e34312e38340000777c000001d102620760a4786d0000000a405256786255617870636d00000028ef219df9a83ccf1b694e1dda5d6bc354411858941b2560b312ed3124ce869b6982b0ec3229bb718b","user_state":0,"f":0}}
-
-
-curl --cookie "ptvfsession=4ed78c502c3e3253909baadf4e5ca7ad470ae151209264bb2365b45c3b8d6129311c06b36419d6bd365dcb0f7a4127b6;  confirmuin=12366550; ptisp=; verifysession=h02a6HFTBV3vTV4HI73fn3DXpby9Eco0Ls28EB5IVvRgRMv5V0HsaH1gC5pT1TR8kKXAXhC7lcFBO7OhLFfetk1Cw**" "https://ssl.ptlogin2.qq.com/login?u=1953024456&p=D7EF36B6308BC20698A4C3A8CB882F6C&verifycode=atzt&webqq_type=10&remember_uin=1&login2qq=1&aid=1003903&u1=http%3A%2F%2Fweb2.qq.com%2Floginproxy.html%3Flogin2qq%3D1%26webqq_type%3D10&h=1&ptredirect=0&ptlang=2052&daid=164&from_ui=1&pttype=1&dumy=&fp=loginerroralert&action=9-7-82251&mibao_css=m_webqq&t=1&g=1&js_type=0&js_ver=10062&login_sig=V0rPh-Ek7s1uNtzdq1dzhnWVfSElUMVBpuvjFQm1oXnwpVLJ93xWCkFCExJ4qWp4"
-
-
-ptvfsession=4ed78c502c3e3253909baadf4e5ca7ad470ae151209264bb2365b45c3b8d6129311c06b36419d6bd365dcb0f7a4127b6;
-pgv_pvid=1724504990; chkuin=12366550;
-confirmuin=12366550; ptisp=;
-verifysession=h02a6HFTBV3vTV4HI73fn3DXpby9Eco0Ls28EB5IVvRgRMv5V0HsaH1gC5pT1TR8kKXAXhC7lcFBO7OhLFfetk1Cw**
-
-
-
-confirmuin=0; PATH=/; DOMAIN=ptlogin2.qq.com;
-ptvfsession=4ed78c502c3e3253909baadf4e5ca7ad470ae151209264bb2365b45c3b8d6129311c06b36419d6bd365dcb0f7a4127b6; PATH=/; DOMAIN=ptlogin2.qq.com;ptisp=; PATH=/; DOMAIN=qq.com;
-
-
-
-confirmuin=0;
-ptvfsession=4ed78c502c3e3253909baadf4e5ca7ad470ae151209264bb2365b45c3b8d6129311c06b36419d6bd365dcb0f7a4127b6;
-ptisp=;
-
-
-
-
-
-curl "https://ssl.ptlogin2.qq.com/login?u=123774072&p=85FA589B0DA90C0563B9333E8AFCFCA7&verifycode=!CBW&webqq_type=10&remember_uin=1&login2qq=1&aid=1003903&u1=http%3A%2F%2Fweb2.qq.com%2Floginproxy.html%3Flogin2qq%3D1%26webqq_type%3D10&h=1&ptredirect=0&ptlang=2052&daid=164&from_ui=1&pttype=1&dumy=&fp=loginerroralert&action=2-24-30502&mibao_css=m_webqq&t=1&g=1&js_type=0&js_ver=10062&login_sig=qBpuWCs9dlR9awKKmzdRhV8TZ8MfupdXF6zyHmnGUaEzun0bobwOhMh6m7FQjvWA"
