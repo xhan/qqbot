@@ -30,7 +30,7 @@ auth_opts ={
     vfwebqq
 }
 
-bot = new QQBot("叫我小可爱",auth_opts)
+bot = new QQBot("叫我小可爱", api.cookies(), auth_opts)
 
 api.get_buddy_list auth_opts, (ret,e)->
     log e  if e
