@@ -6,34 +6,34 @@ log = console.log
 auth = require "../src/qqauth"
 api  = require "../src/qqapi"
 
+defaults = require '../src/defaults'
 config = require '../config'
 qq = config.account 
 pass = config.password
+jsons = JSON.stringify
+
+
+# 设置登录信息
+api.cookies defaults.data 'cookie'
+auth_opts = defaults.data 'auth'
+###
+auth_opts ={
+    psessionid
+    clientid
+    ptwebqq
+    uin
+    vfwebqq
+}
+###
 
 test_api = ->
-    api.defaults_read()
-
-    psessionid = api.defaults 'psessionid' 
-    clientid  = api.defaults 'clientid'   
-    ptwebqq    = api.defaults 'ptwebqq'    
-    uin        = api.defaults 'uin'
-    vfwebqq    = api.defaults 'vfwebqq'
-
-    auth_opts ={
-        psessionid
-        clientid
-        ptwebqq
-        uin
-        vfwebqq
-    }
-
 
     
-    api.get_friend_list uin, ptwebqq, vfwebqq, (ret,e)->
-        log 'friend',ret
+    api.get_buddy_list auth_opts , (ret,e)->
+        log 'friend',jsons ret
         log ''
     
-    api.get_group_list vfwebqq, (ret , e)->
+    api.get_group_list auth_opts, (ret , e)->
         log 'group',ret
         log ''
     

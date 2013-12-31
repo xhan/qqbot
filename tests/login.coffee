@@ -7,6 +7,8 @@ log = console.log
 auth = require "../src/qqauth"
 api  = require "../src/qqapi"
 jsons = JSON.stringify
+defaults = require '../src/defaults'
+
     
 config = require '../config'
 qq = config.account 
@@ -134,6 +136,9 @@ test_after_login = ->
     
 test_login_on_authmodule = ->
     auth.login config , (cookies,auth_info)->
+        defaults.data 'auth' , auth_info
+        defaults.data 'cookie', cookies
+        defaults.save()
         api.cookies( cookies )
         api.long_poll auth_info , (ret)->
             log jsons ret
