@@ -3,15 +3,27 @@ EventEmitter = require('events').EventEmitter
 class Dispatcher extends EventEmitter
     constructor: (@plugins) ->
         @listeners = []
+        @obj_listeners = []
         for plugin_name in @plugins
             @listeners.push require "../plugins/#{plugin_name}"
     
-    dispatch: (content ,send, robot, message)->
+    dispatch: (params...)->
         for plugin in @listeners
-            plugin(content ,send, robot, message)            
+            plugin(params...)
+        for plugin in @obj_listeners
+            [obj,method] = plugin
+            obj[method](params...)
     
+    ###
+    针对 对象的方法
+      请传入 [obj,'methodname']
+      methodname 直接调用 methodname 会破坏内部变量 this.xxx
+    ###
     add_listener: (listener)->
-      @listeners.push listener
+        if listener instanceof Function
+            @listeners.push listener
+        else
+            @obj_listeners.push listener
     
             
 module.exports = Dispatcher
