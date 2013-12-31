@@ -18,7 +18,7 @@ class QQBot
           
         api.cookies @cookies
         @api = api
-        @dispatcher = new Dispatcher(config.plugins)
+        @dispatcher = new Dispatcher(@config.plugins)
     
     # @format PROTOCOL `用户分组信息格式`
     save_buddy_info: (@buddy_info)->
@@ -160,10 +160,10 @@ class QQBot
       
           log.info "fetching groupmember #{name}"
           @update_group_member {name:name} ,(ret,error)=>
-      
+                
               groupinfo = @get_group {name:name} 
               group = new Group(@, groupinfo.gid)
-              @dispatcher.add_listener group.dispatch
+              @dispatcher.add_listener [group,"dispatch"]
               callback group
 
 

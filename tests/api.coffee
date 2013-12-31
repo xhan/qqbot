@@ -27,8 +27,11 @@ auth_opts ={
 ###
 
 test_api = ->
+    # log "长轮训"
+    api.long_poll auth_opts , (ret)->
+        log ret
 
-    
+###    
     api.get_buddy_list auth_opts , (ret,e)->
         log 'friend',jsons ret
         log ''
@@ -36,7 +39,7 @@ test_api = ->
     api.get_group_list auth_opts, (ret , e)->
         log 'group',ret
         log ''
-    
+###    
 
     # api.get_group_member 86784314, vfwebqq , (ret,e)->
     #     log 'group_member' , ret
@@ -48,8 +51,6 @@ test_api = ->
     # api.send_msg_2group 2559225925, "系统提示：hahha" , auth_opts, (ret,e)->
     #     log "group send ret:",ret
         
-    # log "长轮训"
-    # api.long_poll auth_opts , (ret)->
-    #     log ret
+
     
 test_api()    

@@ -30,7 +30,7 @@ module.exports = (content ,send, robot, message)->
         send VERSION_INFO
         
     if content.match /^plugins$/i
-        send "插件列表：\n" + robot.plugin_control.plugins.join('\r\n')
+        send "插件列表：\n" + robot.dispatcher.plugins.join('\r\n')
         
     if content.match /^time$/i
         send "冥王星引力精准校时：" + new Date()
