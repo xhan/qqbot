@@ -1,17 +1,39 @@
-QQBot
------
+QQBot 
+------
+A Hubot adapter for QQ! And also A independence robot lives on the real world.
 使用[非公开协议WebQQ](https://github.com/xhan/qqbot/blob/master/protocol.md)的QQ机器人。命令行工具，由不可思议的CoffeeScript提供支持。
 
-状态
+
+Usage for acts as Hubot Adapter
+------
+* add `hubot-qq` as a dependency in your hubots `package.json`
+* Run `npm install` in your hubots directory
+* Run hubot with `bin/hubot -a qq`
+
+Configurable Variables
+ 
+	HUBOT_QQ_ID			#QQ ID
+	HUBOT_QQ_PASS		#password
+	HUBOT_QQ_GROUP		#group name that hubot listens to
+	HUBOT_QQ_IMGPORT    #the port to serve verify-codes
+
+On linux or osx use `export VARIABLE=VALUE` to set environment variables.
+
+
+Usage for acts as independence robot
 -----
-* :muscle: 可行性测试
+Coming soon
+
+
+功能
+-----
 * :muscle: 登录以及对验证码的支持
-* :muscle: 保持在线，注掉线后暂不能自动重新登录
+* :muscle: 保持在线，注:掉线后暂不能自动重新登录
 * :muscle: 发送消息（qq好友，群）
-* :muscle:  监听派发收到的qq消息
+* :muscle:  监听并派发收到的qq消息
 * :muscle:  插件化
-* :alien:  支持hubot
-* :alien:  日志
+* :muscle:  支持hubot
+
 
 关于
 ----
@@ -35,6 +57,9 @@ QQBot
 * 08:37 有了第三方的资料文档后进展快了不少，增加获取群信息，发消息接口，抽离了httpclient功能，分离测试脚本auth,api
 * 13:11 学习Coffee Class的简单用法，提供了QQBot对象来处理各种接口信息。现已支持简单的poll事件解析
 * 18:05 增加回复响应功能，同时写了个比较挫的插件机制，但是至少似乎运作的还算正常！后续得看下hubot的代码学习下设计
+
+> 2014.01.01
+* 支持hubot，现已加入豪华午餐！
 
 资料
 ----
