@@ -129,9 +129,7 @@ class QQBot
             
         @dispatcher.dispatch(content ,reply, @ , msg)
             
-        
-        
-    
+                    
     _create_message : (event)->
         value = event.value
         msg = 
@@ -139,6 +137,7 @@ class QQBot
             time    : new Date(value.time * 1000)
             from_uin: value.from_uin
             type    : if value.group_code then 'group' else 'buddy'
+            uid     : value.msg_id
             
         if msg.type == 'group'
             msg.from_gid = msg.from_uin

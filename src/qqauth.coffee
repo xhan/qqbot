@@ -5,7 +5,7 @@ querystring  = require 'querystring'
 Url = require('url')
 all_cookies = []
 int = (v) -> parseInt v
-
+Path = require 'path'
 Log = require 'log'
 log = new Log('debug');
 
@@ -79,7 +79,8 @@ create_img_server = (host, port, body ,origin_headers) ->
     return if img_server
     
     fs = require 'fs'
-    fs.writeFileSync 'tmp/t.jpg' , body , 'binary'
+    file_path = Path.join __dirname, "..", "tmp", "verifycode.jpg"
+    fs.writeFileSync file_path , body , 'binary'
     
     img_server = http.createServer (req, res) ->
       res.writeHead 200 , origin_headers
@@ -211,7 +212,7 @@ exports.login_token = (callback) ->
     req.end();
 
 ###
-    全局登录函数，如果有验证码会建立一个 http-server ，同时写入 tmp/t.jpg (osx + open. 操作)
+    全局登录函数，如果有验证码会建立一个 http-server ，同时写入 tmp/*.jpg (osx + open. 操作)
     http-server 的端口和显示地址可配置    
     @param options {account,password,port,host}
     @callback( cookies , auth_options ) if login success

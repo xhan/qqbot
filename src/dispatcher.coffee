@@ -1,9 +1,10 @@
 EventEmitter = require('events').EventEmitter
 
 class Dispatcher extends EventEmitter
-    constructor: (@plugins) ->
+    constructor: (@plugins ) ->
         @listeners = []
         @obj_listeners = []
+        @plugins ||= []
         for plugin_name in @plugins
             @listeners.push require "../plugins/#{plugin_name}"
     

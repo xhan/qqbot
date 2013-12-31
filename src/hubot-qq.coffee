@@ -7,7 +7,7 @@ QQBot= require "../src/qqbot"
 class QQHubotAdapter extends Adapter
     
   send: (envelope, strings...) ->
-      @group.send str for str in strings
+    @group.send str for str in strings
             
   reply: (user, strings...) ->
     @send user, strings...
@@ -21,27 +21,29 @@ class QQHubotAdapter extends Adapter
       groupname: process.env.HUBOT_QQ_GROUP or 'qqbot群'
       port:      process.env.HUBOT_QQ_IMGPORT or 3000
       host:      process.env.HUBOT_QQ_IMGHOST or 'localhost'
-      
+      plugins:   ['help']
+
     unless options.account? and options.password? and options.groupname?
-      @robot.logger.error \
-        "请配置qq 密码 和监听群名字，具体查阅帮助"
+      @robot.logger.error "请配置qq 密码 和监听群名字，具体查阅帮助"
       process.exit(1)
 
-    # login
+
     # TODO: login failed callback
     auth.login options , (cookies,auth_info)=>
-      @bot = new QQBot(cookies,auth_info，options)
+      @bot = new QQBot(cookies,auth_info,options)
       @bot.listen_group options.groupname , (@group,error)=>
                           
-        log.info "enter long poll mode, have fun"
+        @robot.logger.info "enter long poll mode, have fun"
         @bot.runloop()  
         @emit "connected"
         
         @group.on_message (content ,send, robot, message)=>
-          @receive content
-  
-    
+            
+            # uin changed every-time
+            user = @robot.brain.userForId message.from_uin , name:message.from_user.nick , room:options.groupname
+            @receive new TextMessage user, message.content, message.uid
+        
+        
 
 exports.use = (robot) ->
   new QQHubotAdapter robot
-
