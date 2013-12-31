@@ -17,7 +17,7 @@ class QQHubotAdapter extends Adapter
     
     options =
       account:   process.env.HUBOT_QQ_ID or   2769546520
-      password:  process.env.HUBOT_QQ_PASS or 'qqbot123'
+      password:  process.env.HUBOT_QQ_PASS
       groupname: process.env.HUBOT_QQ_GROUP or 'qqbot群'
       port:      process.env.HUBOT_QQ_IMGPORT or 3000
       host:      process.env.HUBOT_QQ_IMGHOST or 'localhost'
