@@ -1,11 +1,9 @@
 api = require './qqapi'
 Log = require 'log'
-log = new Log('debug')
-jsons = JSON.stringify
-
-# 名字起得不好
 Dispatcher = require './dispatcher'
 
+log = new Log('debug')
+jsons = JSON.stringify
 
 ###
  cookie , auth 登录需要参数
@@ -155,35 +153,34 @@ class QQBot
         
     # 监听特定群并返回群对象
     # @callback (group对象, error = null)
-    listen_group : name ,(callback)->
+    
+    listen_group : (name , callback) ->
       log.info 'fetching group list'
       @update_group_list (ret, e) =>
-                             
-          log.info "fetching groupmember #{name}"
-          @update_group_member {name:name} ,(ret,error)=>              
-                            
-              groupinfo = @get_group {name:name} 
-              group = new Group(@,groupinfo.gid)
-              @dispatcher.add_listener group.dispatch
-              callback(group)                            
-
-
       
+          log.info "fetching groupmember #{name}"
+          @update_group_member {name:name} ,(ret,error)=>
+      
+              groupinfo = @get_group {name:name} 
+              group = new Group(@, groupinfo.gid)
+              @dispatcher.add_listener group.dispatch
+              callback group
+
+
 ###
  为hubot专门使用，提供两个方法
  - send
  - on_message (content,send_fun, bot , message_info) ->
 ###              
 class Group
-  constructor: (@bot,@gid)->
-  send: (content ,callback)->
-    @bot.send_message_to_group  @gid , content , (ret,e)->
-        callback(ret,e) if callback
+    constructor: (@bot,@gid)->
+    send: (content , callback)->
+        @bot.send_message_to_group  @gid , content , (ret,e)->
+            callback(ret,e) if callback
   
-  on_message: (@msg_cb)->
-  dispatch: (params...)->
-    @msg_cb(params...) if @msg_cb
-    
+    on_message: (@msg_cb)->
+    dispatch: (params...)->
+        @msg_cb(params...) if @msg_cb
 
-            
+
 module.exports = QQBot    

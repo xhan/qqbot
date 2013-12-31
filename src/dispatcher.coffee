@@ -14,4 +14,4 @@ class Dispatcher extends EventEmitter
       @listeners.push listener
     
             
-module.exports = QQPlugin
+module.exports = Dispatcher
