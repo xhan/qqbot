@@ -1,22 +1,26 @@
 api = require './qqapi'
-api.defaults_read()
-
-log = console.log
+Log = require 'log'
+log = new Log('debug')
 jsons = JSON.stringify
 
-# 名字起得太差了
-Plugin = require './qqplugin'
-config = require '../config'
-plugin = new Plugin(config.plugins,config.listen)
+# 名字起得不好
+Dispatcher = require './dispatcher'
 
 
+###
+ cookie , auth 登录需要参数
+ config:  配置信息，将 config.yaml
+   plugins: 插件
+###
 class QQBot
-    constructor: (@name ,@auth) ->
+    constructor: (@cookies, @auth, @config) ->
         @buddy_info = {}
         @group_info = {}
         @groupmember_info = {}
-        @plugin_control = plugin
-        
+          
+        api.cookies @cookies
+        @api = api
+        @dispatcher = new Dispatcher(config.plugins)
     
     # @format PROTOCOL `用户分组信息格式`
     save_buddy_info: (@buddy_info)->
@@ -51,6 +55,14 @@ class QQBot
                 return item[key] == value
         groups.pop()
     
+    # 获取群列表
+    # @callback {ret?,error}
+    update_group_list: (callback)->
+      @api.get_group_list @auth, (ret , e)=>
+          log.error e  if e
+          @save_group_info ret.result if ret.retcode == 0
+          callback( ret.retcode == 0, e || 'retcode isnot 0' ) if callback
+    
     # 更新群成员， 似乎获取不到群ID
     # @options {key:value} 
     # @callback (true/false , error)
@@ -61,18 +73,32 @@ class QQBot
                 @save_group_member(group,ret.result)
             callback(ret.retcode == 0 , e) if callback
     
+    
+    # 长轮训
+    # @callback 
+    runloop: (callback)->
+      @api.long_poll @auth , (ret,e)=>
+          @handle_poll_responce ret
+          callback(ret,e) if callback
+    
     # 回复消息
     # @param message 收到的message
     # @param content:string 回复信息
     # @callback ret, error
     reply_message: (message, content, callback)->
-        log "发送消息：",content
+        log.info "发送消息：",content
         if message.type == 'group'
             api.send_msg_2group  message.from_gid , content , @auth, (ret,e)->
                 callback(ret,e) if callback
         else if message.type == 'buddy'            
             api.send_msg_2buddy message.from_uin , content , @auth , (ret,e)->
                 callback(ret,e) if callback    
+    
+    # 发送群消息
+    send_message_to_group: (gid, content, callback)->
+      log.info "send msg #{content} to group#{gid}"
+      api.send_msg_2group  gid , content , @auth, (ret,e)->
+        callback(ret,e) if callback
     
     
     # 处理poll返回的内容
@@ -85,14 +111,14 @@ class QQBot
         switch event.poll_type
           when 'group_message' then @_on_message(event)
           when 'message'       then @_on_message(event)
-          else log "unimplemented event",event.poll_type
+          else log.warning "unimplemented event",event.poll_type
         
     _on_message : (event)->
         msg = @_create_message event
         if msg.type == 'group'
-            log "[群消息]","[#{msg.from_group.name}] #{msg.from_user.nick}:#{msg.content} #{msg.time}"
+            log.debug "[群消息]","[#{msg.from_group.name}] #{msg.from_user.nick}:#{msg.content} #{msg.time}"
         else if msg.type == 'buddy'
-            log "[好友消息]","#{msg.from_user.nick}:#{msg.content} #{msg.time}"
+            log.debug "[好友消息]","#{msg.from_user.nick}:#{msg.content} #{msg.time}"
         
         # 消息处理 ，只操作群
         # if msg.type == 'group'
@@ -103,7 +129,7 @@ class QQBot
             @reply_message(msg,content) unless replied
             replied = true
             
-        @plugin_control.dispatch(content ,reply, @ , msg)
+        @dispatcher.dispatch(content ,reply, @ , msg)
             
         
         
@@ -125,12 +151,39 @@ class QQBot
         else if msg.type == 'buddy'
             msg.from_user = @get_user( msg.from_uin )
         msg
+
         
-            
-# class Message
-#     constructor: (@struct)->
-#         @content = @struct.content.slice(-1).pop
-#         @time    = new Date(@struct.time * 1000)
-            
+    # 监听特定群并返回群对象
+    # @callback (group对象, error = null)
+    listen_group : name ,(callback)->
+      log.info 'fetching group list'
+      @update_group_list (ret, e) =>
+                             
+          log.info "fetching groupmember #{name}"
+          @update_group_member {name:name} ,(ret,error)=>              
+                            
+              groupinfo = @get_group {name:name} 
+              group = new Group(@,groupinfo.gid)
+              @dispatcher.add_listener group.dispatch
+              callback(group)                            
+
+
+      
+###
+ 为hubot专门使用，提供两个方法
+ - send
+ - on_message (content,send_fun, bot , message_info) ->
+###              
+class Group
+  constructor: (@bot,@gid)->
+  send: (content ,callback)->
+    @bot.send_message_to_group  @gid , content , (ret,e)->
+        callback(ret,e) if callback
+  
+  on_message: (@msg_cb)->
+  dispatch: (params...)->
+    @msg_cb(params...) if @msg_cb
+    
+
             
 module.exports = QQBot    
