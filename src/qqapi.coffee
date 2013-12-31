@@ -1,17 +1,15 @@
-https = require "https"
-http  = require 'http'
-crypto = require 'crypto'
-querystring  = require 'querystring'
-Url = require('url')
+###
+  QQAPI 包含获取好友，群信息，发送消息，长轮询
+  - 使用前需要设置 cookies()
+###
+
+
+
 all_cookies = []
-defaults    = {}
 fs = require 'fs'
 jsons = JSON.stringify
 client = require './httpclient'
 
-md5 = (str) ->
-    md5sum = crypto.createHash 'md5'
-    md5sum.update(str).digest('hex')
 
 # TODO: logger 分级控制
 log   = console.log
@@ -21,26 +19,6 @@ exports.cookies = (cookie)->
         all_cookies = cookie 
         client.global_cookies(all_cookies)
     return all_cookies
-
-exports.defaults = (key,value)-> 
-    if key and value
-        defaults[key] = value
-    else if key
-        defaults[key]
-    else
-        defaults
-
-exports.defaults_save = ->
-    defaults.cookie = all_cookies
-    fs.writeFileSync 'tmp/store.json' ,  jsons(defaults)
-
-exports.defaults_read = ->
-    try
-        defaults = JSON.parse( fs.readFileSync  'tmp/store.json' )
-        all_cookies  = defaults.cookie
-        client.global_cookies(all_cookies)
-    catch error
-        log error        
 
 
 # 长轮训，默认一分钟
