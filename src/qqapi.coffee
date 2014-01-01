@@ -9,12 +9,9 @@ all_cookies = []
 fs = require 'fs'
 jsons = JSON.stringify
 client = require './httpclient'
+log   = new (require 'log')('debug')
 
-
-# TODO: logger 分级控制
-log   = console.log
-
-exports.cookies = (cookie)->    
+exports.cookies = (cookie)->
     if cookie
         all_cookies = cookie 
         client.global_cookies(all_cookies)
@@ -26,7 +23,7 @@ exports.cookies = (cookie)->
 #  @param callback: ret, e
 #  @return ret retcode 102，正常空消息
 long_poll = (auth_opts, callback) ->
-    log "polling..."
+    log.debug "polling..."
     [clientid, psessionid] = [auth_opts.clientid, auth_opts.psessionid]
     url = "http://d.web2.qq.com/channel/poll2"    
     r =
@@ -119,7 +116,7 @@ exports.send_msg_2buddy = (to_uin , msg , auth_opts ,callback)->
       face: 0
       msg_id: 1000001 #随机msgid
       clientid: "#{opt.clientid}"
-      psessionid: opt.psessionid        
+      psessionid: opt.psessionid
       content: jsons ["#{msg}" , ["font", {name:"宋体", size:"10", style:[0,0,0], color:"000000" }] ]
         
     params = 
@@ -129,6 +126,7 @@ exports.send_msg_2buddy = (to_uin , msg , auth_opts ,callback)->
 
     # log params
     client.post {url:url} , params , (ret,e) ->
+        log.debug 'send2user',jsons ret
         callback( ret , e )
     
 #  @param gid: gid
@@ -150,6 +148,7 @@ exports.send_msg_2group = (gid, msg , auth_opts, callback)->
         clientid:  opt.clientid
         psessionid:opt.psessionid
     client.post {url:url} , params , (ret,e)->
+        log.debug 'send2group',jsons ret
         callback(ret,e)
         
     
