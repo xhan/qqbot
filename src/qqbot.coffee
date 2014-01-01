@@ -60,6 +60,12 @@ class QQBot
           log.error e  if e
           @save_group_info ret.result if ret.retcode == 0
           callback( ret.retcode == 0, e || 'retcode isnot 0' ) if callback
+
+    # 获取好友列表
+    update_buddy_list: (callback)->
+        @api.get_buddy_list @auth , (ret,e)=>
+            @save_buddy_info ret.result if ret.retcode == 0
+            callback( ret.retcode == 0, e || 'retcode isnot 0' ) if callback
     
     # 更新群成员， 似乎获取不到群ID
     # @options {key:value} 
@@ -86,11 +92,11 @@ class QQBot
     reply_message: (message, content, callback)->
         log.info "发送消息：",content
         if message.type == 'group'
-            api.send_msg_2group  message.from_gid , content , @auth, (ret,e)->
+            @api.send_msg_2group  message.from_gid , content , @auth, (ret,e)->
                 callback(ret,e) if callback
-        else if message.type == 'buddy'            
-            api.send_msg_2buddy message.from_uin , content , @auth , (ret,e)->
-                callback(ret,e) if callback    
+        else if message.type == 'buddy'
+            @api.send_msg_2buddy message.from_uin , content , @auth , (ret,e)->
+                callback(ret,e) if callback
     
     # 发送群消息
     send_message_to_group: (gid, content, callback)->
@@ -98,12 +104,20 @@ class QQBot
       api.send_msg_2group  gid , content , @auth, (ret,e)->
         callback(ret,e) if callback
     
+    # 自杀
+    die: (message,info)->
+        log.error "QQBot die! message: #{message}" if message
+        log.error "QQBot die! info #{JSON.stringify info}" if info
+        process.exit(1)
     
     # 处理poll返回的内容
     handle_poll_responce: (resp)->
         code = resp.retcode
-        return if code != 0        
-        @_handle_poll_event(event) for event in resp.result
+        switch code
+          when 0 then @_handle_poll_event(event) for event in resp.result
+          when 121 then @die("登录异常 #{code}",resp)
+          else log.debug resp
+        
         
     _handle_poll_event : (event) ->
         switch event.poll_type
@@ -117,23 +131,20 @@ class QQBot
             log.debug "[群消息]","[#{msg.from_group.name}] #{msg.from_user.nick}:#{msg.content} #{msg.time}"
         else if msg.type == 'buddy'
             log.debug "[好友消息]","#{msg.from_user.nick}:#{msg.content} #{msg.time}"
-        
-        # 消息处理 ，只操作群
-        # if msg.type == 'group'
-        
-        content = msg.content.trim()
+
+        # 消息处理
         replied = false
         reply = (content)=>
             @reply_message(msg,content) unless replied
             replied = true
-            
-        @dispatcher.dispatch(content ,reply, @ , msg)
-            
-                    
+
+        @dispatcher.dispatch(msg.content ,reply, @ , msg)
+
+
     _create_message : (event)->
         value = event.value
         msg = 
-            content : value.content.slice(-1).pop()
+            content : value.content.slice(-1).pop().trim()
             time    : new Date(value.time * 1000)
             from_uin: value.from_uin
             type    : if value.group_code then 'group' else 'buddy'
@@ -156,9 +167,15 @@ class QQBot
     listen_group : (name , callback) ->
       log.info 'fetching group list'
       @update_group_list (ret, e) =>
-      
+          log.info '√ group list fetched'
+                    
+          @update_buddy_list (ret,error)->
+              log.info '√ buddy list fetched' if ret
+
+          
           log.info "fetching groupmember #{name}"
           @update_group_member {name:name} ,(ret,error)=>
+              log.info '√ group memeber fetched'
                 
               groupinfo = @get_group {name:name} 
               group = new Group(@, groupinfo.gid)
@@ -179,6 +196,8 @@ class Group
   
     on_message: (@msg_cb)->
     dispatch: (params...)->
+        # todo: only handle group message
+        # log.debug 'dispatch',params[0],@msg_cb
         @msg_cb(params...) if @msg_cb
 
 
