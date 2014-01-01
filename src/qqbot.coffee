@@ -196,10 +196,10 @@ class Group
             callback(ret,e) if callback
   
     on_message: (@msg_cb)->
-    dispatch: (params...)->
-        # todo: only handle group message
+    dispatch: (content ,send, robot, message)->
         # log.debug 'dispatch',params[0],@msg_cb
-        @msg_cb(params...) if @msg_cb
+        if message.from_gid == @gid and @msg_cb
+            @msg_cb(content ,send, robot, message) 
 
 
 module.exports = QQBot    
