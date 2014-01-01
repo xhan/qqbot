@@ -116,6 +116,7 @@ class QQBot
         switch code
           when 0 then @_handle_poll_event(event) for event in resp.result
           when 121 then @die("登录异常 #{code}",resp)
+          when 102 then 'nothing happened'
           else log.debug resp
         
         
