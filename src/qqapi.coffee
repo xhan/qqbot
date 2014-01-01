@@ -114,7 +114,7 @@ exports.send_msg_2buddy = (to_uin , msg , auth_opts ,callback)->
     r = 
       to: to_uin
       face: 0
-      msg_id: 1000001 #随机msgid
+      msg_id: parseInt Math.random()*100000 + 1000
       clientid: "#{opt.clientid}"
       psessionid: opt.psessionid
       content: jsons ["#{msg}" , ["font", {name:"宋体", size:"10", style:[0,0,0], color:"000000" }] ]
@@ -139,7 +139,7 @@ exports.send_msg_2group = (gid, msg , auth_opts, callback)->
     opt = auth_opts
     r = 
       group_uin:  gid
-      msg_id:     1000001   #随机msgid
+      msg_id:     parseInt Math.random()*100000 + 1000
       clientid:   "#{opt.clientid}"
       psessionid: opt.psessionid
       content:    jsons ["#{msg}" , ["font", {name:"宋体", size:"10", style:[0,0,0], color:"000000" }] ]
@@ -150,5 +150,3 @@ exports.send_msg_2group = (gid, msg , auth_opts, callback)->
     client.post {url:url} , params , (ret,e)->
         log.debug 'send2group',jsons ret
         callback(ret,e)
-        
-    
