@@ -1,7 +1,7 @@
 QQBot 
 ------
 A Hubot adapter for QQ! And also A independence robot lives on the real world.  
-QQ is a instant messaging service widely used in china provided by Tencent.  
+FYI: QQ is a instant messaging service widely used in china provided by Tencent.  
 
 基于[WebQQ协议](https://github.com/xhan/qqbot/blob/master/protocol.md)的QQ机器人。命令行工具，由不可思议的CoffeeScript提供支持。  
 
@@ -10,7 +10,7 @@ QQ is a instant messaging service widely used in china provided by Tencent.
 
 Acts as Hubot Adapter
 ------
-* add `hubot-qq` as a dependency in your hubots `package.json`
+* Add `hubot-qq` as a dependency in your hubots `package.json`
 * Run `npm install` in your hubots directory
 * Run hubot with `bin/hubot -a qq`
 
@@ -20,23 +20,25 @@ Configurable Variables
 	HUBOT_QQ_PASS		#password
 	HUBOT_QQ_GROUP		#group name that hubot listens to
 	HUBOT_QQ_IMGPORT    #the port to serve verify-codes
+	#for more debug variables plz check src/hubot-qq source file
 
-On linux or osx use `export VARIABLE=VALUE` to set environment variables.
+On LINUX or OSX use `export VARIABLE=VALUE` to set environment variables.
 
 
 Acts as independence robot
 -----
-sopfhsapofhawpo2q
+* Install `CoffeeScript` in global by `npm install coffeescript -g`
+* Run `npm install` to update dependencies
+* Make your own copy of `config.yaml`
+* Run `./main.coffee` to keep your bot alive!
 
 
-功能
+功能 Features
 -----
-* :muscle: 登录以及对验证码的支持
-* :muscle: 保持在线，注:掉线后暂不能自动重新登录
-* :muscle: 发送消息（qq好友，群）
-* :muscle:  监听并派发收到的qq消息
-* :muscle:  插件化
-* :muscle:  支持hubot
+* :muscle:  登录（支持验证码）
+* :muscle:  监听并派发收到的qq消息，支持群，好友消息
+* :muscle:  插件化，目前支持消息的派发
+* :muscle:  可作为hubot adapter使用
 
 
 关于
