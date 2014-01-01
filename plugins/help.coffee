@@ -1,13 +1,18 @@
 HELP_INFO = """
-    version         #版本信息和关于
+    version/about   #版本信息和关于
     plugins         #查看载入的插件
     time            #显示时间    
-    echo            #重复后面的话
-    help            #本内容    
+    echo 爱你        #重复后面的话
+    help            #本内容
 """
 
+fs = require 'fs'
+Path = require 'path'
+file_path = Path.join __dirname, "..", "package.json"
+bundle = JSON.parse( fs.readFileSync file_path )
+
 VERSION_INFO = """
-    v1.0.0 qqbot
+    v#{bundle.version} qqbot
     http://github.com/xhan/qqbot
     本工具还由 糗事百科 热血赞助！
 """
@@ -26,8 +31,8 @@ module.exports = (content ,send, robot, message)->
     if content.match /^help$/i
         send HELP_INFO 
         
-    if content.match /^VERSION$/i
-        send VERSION_INFO
+    if content.match /^VERSION|ABOUT$/i
+      send VERSION_INFO
         
     if content.match /^plugins$/i
         send "插件列表：\n" + robot.dispatcher.plugins.join('\r\n')
