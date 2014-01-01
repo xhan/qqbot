@@ -13,7 +13,7 @@ log   = new (require 'log')('debug')
 
 exports.cookies = (cookie)->
     if cookie
-        all_cookies = cookie 
+        all_cookies = cookie
         client.global_cookies(all_cookies)
     return all_cookies
 
@@ -25,26 +25,26 @@ exports.cookies = (cookie)->
 long_poll = (auth_opts, callback) ->
     log.debug "polling..."
     [clientid, psessionid] = [auth_opts.clientid, auth_opts.psessionid]
-    url = "http://d.web2.qq.com/channel/poll2"    
+    url = "http://d.web2.qq.com/channel/poll2"
     r =
         clientid: "#{clientid}"
         psessionid: psessionid
         key:0
-        ids:[]    
-    params = 
+        ids:[]
+    params =
         clientid: clientid
         psessionid: psessionid
         r: jsons r
-    
+
     client.post {url:url} , params , (ret,e)->
         long_poll( auth_opts , callback )
         callback(ret,e)
-            
+
 exports.long_poll = long_poll
 
 # http://0.web.qstatic.com/webqqpic/pubapps/0/50/eqq.all.js
 # uin, ptwebqq
-hash_func = 
+hash_func =
 `
 function(b, i) {
                 for (var a = [], s = 0; s < i.length; s++) a[s % 4] ^= i.charCodeAt(s);
@@ -72,7 +72,7 @@ function(b, i) {
 exports.get_buddy_list = (auth_opts, callback)->
     opt = auth_opts
     url = "http://s.web2.qq.com/api/get_user_friends2"
-    r = 
+    r =
       h: "hello"
       hash: hash_func(opt.uin, opt.ptwebqq)
       vfwebqq: opt.vfwebqq
@@ -85,11 +85,11 @@ exports.get_buddy_list = (auth_opts, callback)->
 #  @param callback: ret, e
 #  retcode 0
 exports.get_group_list = ( auth_opts, callback)->
-    aurl = "http://s.web2.qq.com/api/get_group_name_list_mask2"    
+    aurl = "http://s.web2.qq.com/api/get_group_name_list_mask2"
     r    = vfwebqq:  auth_opts.vfwebqq
-    
+
     client.post {url:aurl} , {r:jsons(r)} , (ret, e )->
-            callback(ret,e) 
+            callback(ret,e)
 
 
 #  @param group_code: code
@@ -101,25 +101,25 @@ exports.get_group_member = (group_code, auth_opts, callback)->
     url += "?gcode=#{group_code}&cb=undefined&vfwebqq=#{auth_opts.vfwebqq}&t=#{new Date().getTime()}"
     client.get {url:url}, (ret,e)->
         callback(ret,e)
-    
+
 
 #  @param to_uin: uin
 #  @param msg, 消息
 #  @param auth_opts: [clientid,psessionid]
 #  @param callback: ret, e
-#  @return ret retcode 0    
-exports.send_msg_2buddy = (to_uin , msg , auth_opts ,callback)->    
-    url = "http://d.web2.qq.com/channel/send_buddy_msg2"    
+#  @return ret retcode 0
+exports.send_msg_2buddy = (to_uin , msg , auth_opts ,callback)->
+    url = "http://d.web2.qq.com/channel/send_buddy_msg2"
     opt = auth_opts
-    r = 
+    r =
       to: to_uin
       face: 0
       msg_id: parseInt Math.random()*100000 + 1000
       clientid: "#{opt.clientid}"
       psessionid: opt.psessionid
       content: jsons ["#{msg}" , ["font", {name:"宋体", size:"10", style:[0,0,0], color:"000000" }] ]
-        
-    params = 
+
+    params =
         r: jsons r
         clientid: opt.clientid
         psessionid: opt.psessionid
@@ -128,16 +128,16 @@ exports.send_msg_2buddy = (to_uin , msg , auth_opts ,callback)->
     client.post {url:url} , params , (ret,e) ->
         log.debug 'send2user',jsons ret
         callback( ret , e )
-    
+
 #  @param gid: gid
 #  @param msg, 消息
 #  @param auth_opts: [clientid,psessionid]
 #  @param callback: ret, e
-#  @return ret retcode 0    
+#  @return ret retcode 0
 exports.send_msg_2group = (gid, msg , auth_opts, callback)->
     url = 'http://d.web2.qq.com/channel/send_qun_msg2'
     opt = auth_opts
-    r = 
+    r =
       group_uin:  gid
       msg_id:     parseInt Math.random()*100000 + 1000
       clientid:   "#{opt.clientid}"
