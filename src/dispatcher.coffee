@@ -7,14 +7,14 @@ class Dispatcher extends EventEmitter
         @plugins ||= []
         for plugin_name in @plugins
             @listeners.push require "../plugins/#{plugin_name}"
-    
+
     dispatch: (params...)->
         for plugin in @listeners
             plugin(params...)
         for plugin in @obj_listeners
             [obj,method] = plugin
             obj[method](params...)
-    
+
     ###
     针对 对象的方法
       请传入 [obj,'methodname']
@@ -25,6 +25,6 @@ class Dispatcher extends EventEmitter
             @listeners.push listener
         else
             @obj_listeners.push listener
-    
-            
+
+
 module.exports = Dispatcher

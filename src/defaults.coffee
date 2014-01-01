@@ -10,7 +10,7 @@ empty = (obj)->
 exports.set_path = (newpath)->
   path = newpath
 
-exports.data = (key,value)-> 
+exports.data = (key,value)->
     read() if empty? defaults
     if key and value
         defaults[key] = value
