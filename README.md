@@ -3,7 +3,9 @@ QQBot
 A Hubot adapter for QQ! And also A independence robot lives on the real world.  
 QQ is a instant messaging service widely used in china provided by Tencent.  
 
-使用[WebQQ协议](https://github.com/xhan/qqbot/blob/master/protocol.md)的QQ机器人。命令行工具，由不可思议的CoffeeScript提供支持。
+基于[WebQQ协议](https://github.com/xhan/qqbot/blob/master/protocol.md)的QQ机器人。命令行工具，由不可思议的CoffeeScript提供支持。  
+
+>DEMO 测试用QQ群：346167134
 
 
 Acts as Hubot Adapter
@@ -66,5 +68,6 @@ sopfhsapofhawpo2q
 
 资料
 ----
-* 开源的webqq协议的win客户端 https://code.google.com/p/mingqq/
+* WebQQ协议     https://github.com/xhan/qqbot/blob/master/protocol.md
 * WebQQ协议专题  http://www.10qf.com/forum-52-1.html
+* 开源的webqq协议的win客户端 https://code.google.com/p/mingqq/
