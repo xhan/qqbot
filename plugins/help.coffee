@@ -54,5 +54,5 @@ module.exports = (content ,send, robot, message)->
       secs = (new Date().getTime() - start_at) / 1000
       aday  = 86400 
       ahour = 3600
-      [day,hour,minute,second] = [secs/ aday,secs%aday/ ahour,secs%ahour/ 60,sec%60].map (i)-> parseInt(i)
+      [day,hour,minute,second] = [secs/ aday,secs%aday/ ahour,secs%ahour/ 60,secs%60].map (i)-> parseInt(i)
       send "up #{day} days, #{hour}:#{minute}:#{second}"
