@@ -126,7 +126,7 @@ class QQBot
     # @callback
     runloop: (callback)->
       @api.long_poll @auth , (ret,e)=>
-          @handle_poll_responce ret
+          @handle_poll_responce ret,e
           callback(ret,e) if callback
 
     # 回复消息
@@ -155,13 +155,16 @@ class QQBot
         process.exit(1)
 
     # 处理poll返回的内容
-    handle_poll_responce: (resp)->
-        code = resp.retcode
-        switch code
-          when 0 then @_handle_poll_event(event) for event in resp.result
-          when 121 then @die("登录异常 #{code}",resp)
-          when 102 then 'nothing happened'
-          else log.debug resp
+    handle_poll_responce: (resp,e)->
+      log.error "poll with error #{e}" if e
+      code = if resp then resp.retcode else -1
+      switch code
+        when -1  then log.error "resp is null"
+        when 0   then @_handle_poll_event(event) for event in resp.result
+        when 116 then '返回一个p:里面是字符串，不知道干吗的'
+        when 121 then @die("登录异常 #{code}",resp)
+        when 102 then 'nothing happened'
+        else log.debug resp
 
 
     _handle_poll_event : (event) ->
