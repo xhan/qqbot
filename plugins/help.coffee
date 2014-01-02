@@ -4,6 +4,7 @@ HELP_INFO = """
     time            #显示时间
     echo 爱你        #重复后面的话
     help            #本内容
+    uptime          #服务运行时间
 """
 
 fs = require 'fs'
@@ -17,6 +18,8 @@ VERSION_INFO = """
     本工具还由 糗事百科 热血赞助！
 """
 
+# 毫秒亲
+start_at = new Date().getTime()
 ###
  @param content 消息内容
  @param send(content)  回复消息
@@ -46,4 +49,10 @@ module.exports = (content ,send, robot, message)->
     ret = content.match /^echo (.*)/i
     if ret
         send "哈哈，" + ret[1]
-
+        
+    if content.match /^uptime$/i
+      secs = (new Date().getTime() - start_at) / 1000
+      aday  = 86400 
+      ahour = 3600
+      [day,hour,minute,second] = [secs/ aday,secs%aday/ ahour,secs%ahour/ 60,sec%60].map (i)-> parseInt(i)
+      send "up #{day} days, #{hour}:#{minute}:#{second}"
