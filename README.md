@@ -27,7 +27,7 @@ On LINUX or OSX use `export VARIABLE=VALUE` to set environment variables.
 
 Acts as independence robot
 -----
-* Install `CoffeeScript` in global by `npm install coffeescript -g`
+* Install `CoffeeScript` in global by `sudo npm install -g coffee-script`
 * Run `npm install` to update dependencies
 * Make your own copy of `config.yaml`
 * Run `./main.coffee` to keep your bot alive!
