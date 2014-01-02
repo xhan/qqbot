@@ -225,7 +225,7 @@ exports.login = (options, callback) ->
     log.info '登录 step0 验证码检测'
     auth.check_qq qq , (result) ->
       # log.debug "验证帐号:", result
-      [need_verify,verifycode,bits] = result
+      [need_verify,verify_code,bits] = result
       if int need_verify
         log.info "登录 step0.5 获取验证码"
         auth.get_verify_code qq, opt.host, opt.port, (error) ->
