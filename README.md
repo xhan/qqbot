@@ -32,6 +32,14 @@ Acts as independence robot
 * Make your own copy of `config.yaml`
 * Run `./main.coffee` to keep your bot alive!
 
+Run on Production Mode
+-----
+Since QQBot asks `Verify Code` on `STDIN`, it's hard to interacts with it when tends to running on background.  
+Some Workarounds:  
+
+* Get PID of QQBot , and pipe to `/proc/($pid)/fd/0`
+* Get Auth info by running `./main.coffee` first, then do `./main.coffee &>> logs &` to enter background.
+
 
 功能 Features
 -----
