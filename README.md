@@ -67,6 +67,7 @@ Acts as independence robot
 > 2014.01.01
 
 * 支持hubot，现已加入豪华午餐！
+* 增加独立运行的入口文件 `main.coffee`
 
 资料
 ----
