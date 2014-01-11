@@ -166,19 +166,31 @@ class QQBot
         when 102 then 'nothing happened'
         else log.debug resp
 
+    # 更新token ptwebqq的值，返回值116
+    _update_ptwebqq: (value)->
+      # TODO:
+
 
     _handle_poll_event : (event) ->
         switch event.poll_type
           when 'group_message' then @_on_message(event)
           when 'message'       then @_on_message(event)
-          else log.warning "unimplemented event",event.poll_type
+          # sys_g_msg
+          # when 'input_notify'  then ""
+          # when 'buddies_status_change' then ""
+          else log.warning "unimplemented event",event.poll_type , "content: ", jsons event
 
     _on_message : (event)->
         msg = @_create_message event
-        if msg.type == 'group'
+        try
+          if msg.type == 'group'
             log.debug "[群消息]","[#{msg.from_group.name}] #{msg.from_user.nick}:#{msg.content} #{msg.time}"
-        else if msg.type == 'buddy'
+          else if msg.type == 'buddy'
             log.debug "[好友消息]","#{msg.from_user.nick}:#{msg.content} #{msg.time}"
+        catch error
+          log.error "on_message #{error}"
+          log.debug "on_message #{msg}"
+
 
         # 消息处理
         replied = false
