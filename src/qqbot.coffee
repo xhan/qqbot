@@ -122,7 +122,7 @@ class QQBot
           check()
 
 
-    # 长轮训
+    # 长轮询
     # @callback
     runloop: (callback)->
       @api.long_poll @auth , (ret,e)=>
@@ -150,8 +150,9 @@ class QQBot
 
     # 自杀
     die: (message,info)->
-        log.error "QQBot die! message: #{message}" if message
-        log.error "QQBot die! info #{JSON.stringify info}" if info
+      #TODO: 这里 log.error 似乎看不到日志输出，试试console
+        console.log "QQBot die! message: #{message}" if message
+        console.log "QQBot die! info #{JSON.stringify info}" if info
         process.exit(1)
 
     # 处理poll返回的内容
@@ -161,14 +162,22 @@ class QQBot
       switch code
         when -1  then log.error "resp is null"
         when 0   then @_handle_poll_event(event) for event in resp.result
-        when 116 then '返回一个p:里面是字符串，不知道干吗的'
-        when 121 then @die("登录异常 #{code}",resp)
         when 102 then 'nothing happened'
+        when 103 then '应该是token失效了，但是偶尔也有情况返回' ; @die("登录异常 #{code}",resp)
+        when 116 then @_update_ptwebqq(resp)
+        when 121 then @die("登录异常 #{code}",resp)
         else log.debug resp
 
-    # 更新token ptwebqq的值，返回值116
-    _update_ptwebqq: (value)->
-      # TODO:
+    # token改变后的通知
+    # callback( @auth )
+    on_token_changed: (callback)->
+      @cb_token_changed = callback
+      
+    # 更新token ptwebqq的值，返回值{116 ,p=token}
+    # TODO 看看cookie是否也需要修改
+    _update_ptwebqq: (ret)->
+      @auth['ptwebqq'] = ret.p
+      @cb_token_changed(@auth)
 
 
     _handle_poll_event : (event) ->
