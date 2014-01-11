@@ -93,9 +93,31 @@ test7 =->
     setTimeout ->
     log "next"
     ,300
-test7()
+# test7()
 
 # setTimeout ->
 #     log 'test'
 # ,500
     
+    
+test8 =->
+  # 似乎无法在自己执行中传入stdin
+  # process.stdin.resume()
+  process.stdin.on "data",  (data) ->
+    data = data.toString().trim()
+    console.log 'received: ', data
+  process.stdin.on 'end', ->
+    console.log 'end'
+
+  Readable = require('stream').Readable
+  rs = new Readable
+  rs.push('beep ')
+  rs.push('boop\n')
+  rs.push(null)
+
+  # rs.pipe(process.stdin)
+  process.stdin.resume()
+
+
+test8()  
+  
