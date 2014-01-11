@@ -277,17 +277,22 @@ login_next = (account , pass_encrypted , verify_code , callback)->
 
 
 # prompt user to input something
+# and also listen for process event data
 # @param title : prompt title
 # @callback(content)
 exports.prompt = (title, callback) ->
     process.stdin.resume()
     process.stdout.write(title)
+    process.on "data" , (data) ->
+      if data
+        callback data
+        process.stdin.pause()
     process.stdin.on "data",  (data) ->
-        data = data.toString().trim()
-        # 过滤无效内容
-        if data
-            callback data
-            process.stdin.pause()
+      data = data.toString().trim()
+      # 过滤无效内容
+      if data
+        callback data
+        process.stdin.pause()
     # control + d to end
     process.stdin.on 'end', ->
       process.stdout.write('end')
