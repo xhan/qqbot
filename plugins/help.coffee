@@ -5,6 +5,7 @@ HELP_INFO = """
     echo 爱你        #重复后面的话
     help            #本内容
     uptime          #服务运行时间
+    roll            #返回1-100随机值
 """
 
 fs = require 'fs'
@@ -56,3 +57,7 @@ module.exports = (content ,send, robot, message)->
       ahour = 3600
       [day,hour,minute,second] = [secs/ aday,secs%aday/ ahour,secs%ahour/ 60,secs%60].map (i)-> parseInt(i)
       send "up #{day} days, #{hour}:#{minute}:#{second}"
+      
+    if content.match /^roll$/i
+      # TODO:who? , need a reply method
+      send Math.round( Math.random() * 100)
