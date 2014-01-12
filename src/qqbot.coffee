@@ -179,6 +179,7 @@ class QQBot
     # 更新token ptwebqq的值，返回值{116 ,p=token}
     # TODO 看看cookie是否也需要修改
     _update_ptwebqq: (ret)->
+      log.info 'need to update ptwebqq ',ret
       @auth['ptwebqq'] = ret.p
       @cb_token_changed(@auth)
 
@@ -196,6 +197,7 @@ class QQBot
         msg = @_create_message event
         try
           if msg.type == 'group'
+            update_group_member msg.from_group unless msg.from_user  #更新新用户
             log.debug "[群消息]","[#{msg.from_group.name}] #{msg.from_user.nick}:#{msg.content} #{msg.time}"
           else if msg.type == 'buddy'
             log.debug "[好友消息]","#{msg.from_user.nick}:#{msg.content} #{msg.time}"
