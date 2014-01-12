@@ -4,10 +4,15 @@ account:  2769546520
 password: 
 
 # 验证码图片
-port: 3000
+port: 3100
 host: localhost
 
 
 # 插件列表
 plugins:
     - help
+    - debug
+
+# 激活api服务
+api-port:  3000
+api-token: ''
