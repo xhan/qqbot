@@ -82,3 +82,9 @@ Some Workarounds:
 * WebQQ协议     https://github.com/xhan/qqbot/blob/master/protocol.md
 * WebQQ协议专题  http://www.10qf.com/forum-52-1.html
 * 开源的webqq协议的win客户端 https://code.google.com/p/mingqq/
+
+
+TODO
+---
+* 机器人响应前缀
+* 支持讨论组
