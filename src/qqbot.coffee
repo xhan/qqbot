@@ -143,7 +143,10 @@ class QQBot
                 callback(ret,e) if callback
 
     # 发送群消息
-    send_message_to_group: (gid, content, callback)->
+    # @param gid_or_group 
+    # @callback (ret,e)
+    send_message_to_group: (gid_or_group, content, callback)->
+      gid = if typeof gid_or_group is 'object' then gid_or_group.gid else gid_or_group
       log.info "send msg #{content} to group#{gid}"
       api.send_msg_2group  gid , content , @auth, (ret,e)->
         callback(ret,e) if callback
