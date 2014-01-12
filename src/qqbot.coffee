@@ -181,7 +181,7 @@ class QQBot
     _update_ptwebqq: (ret)->
       log.info 'need to update ptwebqq ',ret
       @auth['ptwebqq'] = ret.p
-      @cb_token_changed(@auth)
+      @cb_token_changed(@auth) if @cb_token_changed
 
 
     _handle_poll_event : (event) ->

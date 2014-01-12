@@ -88,3 +88,4 @@ TODO
 * 机器人响应前缀
 * 支持讨论组
 * 图片发送支持
+* plugin try-catch , reload on the run
