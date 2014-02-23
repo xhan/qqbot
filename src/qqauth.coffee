@@ -11,7 +11,7 @@ log = new Log('debug');
 
 md5 = (str) ->
     md5sum = crypto.createHash 'md5'
-    md5sum.update(str).digest('hex')
+    md5sum.update(str.toString()).digest('hex')
 
 
 
