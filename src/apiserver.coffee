@@ -8,6 +8,8 @@
 
   @发送STDIN(图片验证码)      /stdin {value = 需要传入的stdin值}
 
+  @更新插件  /reload
+
   返回值 JSON
   {
     err:0
@@ -28,6 +30,7 @@ config_token = null
 config_port  = null
 cb_sendmessage = null
 
+# 处理post的信息，来自网络
 processPost = (request, response, callback) ->
     queryData = ""
     return null if typeof callback isnt 'function'
@@ -64,6 +67,9 @@ on_sendmsg = (req,res,params)->
     log.warning msg
     res.endjson {err:100,msg:msg}
 
+on_reload_plugin = (req,res,params)->
+  res.endjson {err:1, msg:"method unimplemented"}
+
 handle_request = (req,res,path,params)->
   res.endjson = (dict={})->
     ret_dict =
@@ -82,6 +88,7 @@ handle_request = (req,res,path,params)->
   switch path
     when '/stdin' then on_stdin(req,res,params)
     when '/send'  then on_sendmsg(req,res,params)
+    when '/reload'then on_reload_plugin(req,res,params)
 
 
 create_server = (port)->
