@@ -18,7 +18,7 @@ exports.cookies = (cookie)->
     return all_cookies
 
 
-# 长轮训，默认一分钟
+# 长轮询，默认一分钟
 #  @param : [clientid,psessionid]
 #  @param callback: ret, e
 #  @return ret retcode 102，正常空消息
@@ -89,7 +89,8 @@ exports.get_group_list = ( auth_opts, callback)->
     r    = vfwebqq:  auth_opts.vfwebqq
 
     client.post {url:aurl} , {r:jsons(r)} , (ret, e )->
-            callback(ret,e)
+      
+      callback(ret,e)
 
 
 #  @param group_code: code
