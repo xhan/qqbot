@@ -14,6 +14,10 @@ global_cookies = (cookie)->
     all_cookies = cookie if cookie
     return all_cookies
 
+# options url:url
+#         method: GET/POST
+# @params 请求参数
+# @callback( ret, error)  ret为json序列对象
 http_request = (options , params , callback) ->
     aurl = URL.parse( options.url )
     options.host = aurl.host
@@ -23,10 +27,14 @@ http_request = (options , params , callback) ->
     client =  if aurl.protocol == 'https:' then https else http
     body = ''
     if params and options.method == 'POST'
-        data = querystring.stringify params
-        options.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8'
-        options.headers['Content-Length']= Buffer.byteLength(data)
-
+      data = querystring.stringify params
+      options.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8'
+      options.headers['Content-Length']= Buffer.byteLength(data)
+    if params and options.method == 'GET'
+      query = querystring.stringify params
+      append = if aurl.query then '&' else '?'
+      options.path += append + query
+      
     options.headers['Cookie'] = all_cookies
     options.headers['Referer'] = 'http://d.web2.qq.com/proxy.html?v=20110331002&callback=1&id=3'
 
@@ -55,9 +63,17 @@ handle_resp_body = (body , callback) ->
     callback(ret,err)
 
 
-http_get  = (options , callback) ->
-    options.method = 'GET'
-    http_request( options , null , callback)
+# 2 ways to call it
+# url, params, callback or
+# url, callback
+# 
+http_get  = (args...) ->
+  [url,params,callback] = args
+  [params,callback] = [null,params] unless callback
+  options = 
+    method : 'GET'
+    url    : url    
+  http_request( options , params , callback)
 
 http_post = (options , body, callback) ->
     options.method = 'POST'

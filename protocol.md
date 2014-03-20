@@ -25,8 +25,8 @@ ptui_checkVC('1','4GJSgm18Bw-8yw5JGKpSOXH-0idqvaCU','\x00\x00\x00\x00\xa5\x13\xe
 密码加密方式，略
 
 	ptuiCB('7','0','','0','很遗憾，网络连接出现异常，请您稍后再试。(2220884626)', '123774072'); `参数不对就出现这个`
-	ptuiCB('4','0','','0','您输入的验证码不正确，请重新输入。', '123774072');	
-	ptuiCB('24','0','','0','很遗憾，网络连接出现异常，请您检查是否禁用cookies。(3972006392)', '123774072'); 
+	ptuiCB('4','0','','0','您输入的验证码不正确，请重新输入。', '123774072');
+	ptuiCB('24','0','','0','很遗憾，网络连接出现异常，请您检查是否禁用cookies。(3972006392)', '123774072');
 	ptuiCB('4','2','','0','页面过期，请重试。*', '123774072');
 	ptuiCB('0','0','link','0','登录成功！', '呼吸 (糗百)');
 	[ '3', '0', '', '0', '您输入的帐号或密码不正确，请重新输入。', '2769546520' ]
@@ -38,10 +38,10 @@ ptui_checkVC('1','4GJSgm18Bw-8yw5JGKpSOXH-0idqvaCU','\x00\x00\x00\x00\xa5\x13\xe
 
 
 5.获取登录token
------        
-需要保存的几个参数，当然之前获得的cookie是必要的     
-                       
-	psessionid : 本次返回值 
+-----
+需要保存的几个参数，当然之前获得的cookie是必要的
+
+	psessionid : 本次返回值
 	client_id  : 步骤@4 自己生成
 	ptwebqq    : 步骤@4 来源cookie
 	uin        : 本次返回值
@@ -204,6 +204,10 @@ http://0.web.qstatic.com/webqqpic/pubapps/0/50/eqq.all.js  搜索 P=function
         }
     ]
 }
+flag 1090519041
+gid 2774835871   #发表用到
+code 1787526753  #获取群member用到
+
 
 ```
 
@@ -211,3 +215,91 @@ http://0.web.qstatic.com/webqqpic/pubapps/0/50/eqq.all.js  搜索 P=function
 ``` json
 {"retcode":0,"result":{"stats":[{"client_type":1,"uin":2440652742,"stat":10},{"client_type":41,"uin":2769546520,"stat":10}],"minfo":[{"nick":"呼吸 (糗百)","province":"上海","gender":"male","uin":2440652742,"country":"中国","city":"浦东新区"},{"nick":"robot","province":"上海","gender":"female","uin":2899268194,"country":"中国","city":"杨浦"},{"nick":"qqbot","province":"广东","gender":"male","uin":2769546520,"country":"中国","city":"深圳"},{"nick":"robot ops","province":"上海","gender":"male","uin":2041084648,"country":"中国","city":"黄浦"}],"ginfo":{"face":0,"memo":"","class":10048,"fingermemo":"","code":3483368056,"createtime":1388307595,"flag":1090519041,"level":0,"name":"qqbot群","gid":2559225925,"owner":2769546520,"members":[{"muin":2440652742,"mflag":21},{"muin":2899268194,"mflag":20},{"muin":2769546520,"mflag":20},{"muin":2041084648,"mflag":0}],"option":1},"vipinfo":[{"vip_level":0,"u":2440652742,"is_vip":0},{"vip_level":0,"u":2899268194,"is_vip":0},{"vip_level":0,"u":2769546520,"is_vip":0},{"vip_level":0,"u":2041084648,"is_vip":0}]}}
 ```
+
+
+8. 讨论组
+
+
+获取讨论组
+
+GET http://s.web2.qq.com/api/get_discus_list
+
+clientid
+psessionid
+vfwebqq
+t
+
+
+ret {"retcode":0,"result":{"dnamelist":[{"name":"good day","did":2006892653}]}}
+
+
+获取讨论组 成员
+
+GET http://d.web2.qq.com/channel/get_discu_info
+did
+clientid
+psessionid
+vfwebqq
+t
+
+
+{"retcode":0,"result":{"info":{"did":2006892653,"discu_owner":1657605740,"discu_name":"good day","info_seq":2,"mem_list":[{"mem_uin":1960624993,"ruin":21984709},{"mem_uin":1657605740,"ruin":123774072},{"mem_uin":2769546520,"ruin":2769546520}]},"mem_status":[{"uin":1657605740,"status":"online","client_type":1},{"uin":2769546520,"status":"online","client_type":41}],"mem_info":[{"uin":1960624993,"nick":"21984709"},{"uin":1657605740,"nick":"\u547C\u5438 (\u7CD7\u767E)"},{"uin":2769546520,"nick":"qqbot"}]}}
+
+
+发表消息：  
+did -> 组标识  
+
+POST http://d.web2.qq.com/channel/send_discu_msg2
+
+
+
+post:
+clientid
+psessionid
+r= 
+{"did":"2006892653","content":"[\"gogo\\n\",[\"font\",{\"name\":\"宋体\",\"size\":\"10\",\"style\":[0,0,0],\"color\":\"000000\"}]]","msg_id":78330002,"clientid":"30833194","psessionid":"8368046764001d636f6e6e7365727665725f77656271714031302e3133332e34312e38340000687900000ac0026e040018ed13a56d0000000a404c3453313676556f5a6d0000002815ee4198a3f863ce8931fec0dd1fe0e6fc9c06887829c4f7342a936929d79271bdac9e0764af52f9"}  
+
+clientid:84369220
+         30833194
+                  
+{
+    "clientid": "30833194",
+    "content": "[\"gogo\\n\",[\"font\",{\"name\":\"宋体",\"size\":\"10\",\"style\":[0,0,0],\"color\":\"000000\"}]]",
+    "did": "2006892653",
+    "msg_id": 78330002,
+    "psessionid": "8368046764001d636f6e6e7365727665725f77656271714031302e3133332e34312e38340000687900000ac0026e040018ed13a56d0000000a404c3453313676556f5a6d0000002815ee4198a3f863ce8931fec0dd1fe0e6fc9c06887829c4f7342a936929d79271bdac9e0764af52f9"
+}
+
+
+图片  {"did":"2006892653","key":"E3MR8qZFt9xvRYRp","sig":"70448d5ab241b34b39622d1d6eaebdd462af7e55a154fa0cf7fccac522cac89ae78abdc646825f2f3429b31d913823e200eb2a319b4ea034","content":"[[\"cface\",\"group\",\"8D100B2F7A9221FBD60D46AA97E038B9.jPg\"],\"\\n\",[\"font\",{\"name\":\"宋体\",\"size\":\"10\",\"style\":[0,0,0],\"color\":\"000000\"}]]","clientid":"72295937","psessionid":"8368046764001d636f6e6e7365727665725f77656271714031302e3133332e34312e38340000019000000ac1026e040018ed13a56d0000000a404c3453313676556f5a6d00000028402c0abcd7ca6e184430d72632b8cb5e965901346358ba0111a7df92673c6a86251c124ef348c8c0"}
+```
+
+
+
+
+讨论组图片
+POST  http://up.web2.qq.com/cgi-bin/cface_upload?time=1395248690537
+	multipart/form-data;
+	--
+	from	control
+	f	EQQ.Model.ChatMsg.callbackSendPicGroup
+	vfwebqq	402c0abcd7ca6e184430d72632b8cb5e965901346358ba0111a7df92673c6a86251c124ef348c8c0
+	custom_face  binary
+	fileid 1
+
+http://web2.qq.com/cgi-bin/webqq_app/?cmd=2&bd=8D100B2F7A9221FBD60D46AA97E038B9.jPg&vfwebqq=402c0abcd7ca6e184430d72632b8cb5e965901346358ba0111a7df92673c6a86251c124ef348c8c0
+
+8D100B2F7A9221FBD60D46AA97E038B9.jPg8D100B2F7A9221FBD60D46AA97E038B9.jPg -7001
+
+
+讨论组图片2
+get http://d.web2.qq.com/channel/get_gface_sig2?clientid=72295937&psessionid=8368046764001d636f6e6e7365727665725f77656271714031302e3133332e34312e38340000019000000ac1026e040018ed13a56d0000000a404c3453313676556f5a6d00000028402c0abcd7ca6e184430d72632b8cb5e965901346358ba0111a7df92673c6a86251c124ef348c8c0&t=1395248986808
+
+{"retcode":0,"result":{"reply":0,"gface_key":"E3MR8qZFt9xvRYRp","gface_sig":"70448d5ab241b34b39622d1d6eaebdd462af7e55a154fa0cf7fccac522cac89ae78abdc646825f2f3429b31d913823e200eb2a319b4ea034"}}
+
+
+
+接受消息：
+
+
+{"retcode":0,"result":[{"poll_type":"discu_message","value":{"msg_id":18803,"from_uin":10000,"to_uin":2769546520,"msg_id2":175418,"msg_type":42,"reply_ip":176488598,"did":2006892653,"send_uin":1657605740,"seq":8,"time":1395249174,"info_seq":2,"content":[["font",{"size":13,"color":"004faa","style":[0,0,0],"name":"STKaiti"}],"world "]}}]}

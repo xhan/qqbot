@@ -1,9 +1,9 @@
-QQBot 
+QQBot
 ------
 A Hubot adapter for QQ! And also A independence robot lives on the real world.  
 FYI: QQ is a instant messaging service widely used in china provided by Tencent.  
 
-基于[WebQQ协议](https://github.com/xhan/qqbot/blob/master/protocol.md)的QQ机器人。命令行工具，由不可思议的CoffeeScript提供支持。  
+基于[WebQQ协议](https://github.com/xhan/qqbot/blob/master/protocol.md)的QQ机器人。命令行工具，由不可思议的IcedCoffeeScript提供支持。  
 
 >DEMO 调戏用(测试和交流)QQ群：346167134
 
@@ -21,9 +21,6 @@ FYI: QQ is a instant messaging service widely used in china provided by Tencent.
 * 部署机器人（请了解hubot的概念）
 * 通知机器人（监控报警啊什么的，对于天天做电脑前报警还得通过邮件短信提醒多不直接呢）
 
-注意
------
-再啰嗦下，由于还是不习惯这种[CPS风格](http://en.wikipedia.org/wiki/Continuation-passing_style)编码方式。尝试暂用iced来做后续开发。更新暂放在新分支上。查看代码时请注意分支 :D
 
 Acts as Hubot Adapter
 ------
@@ -32,7 +29,7 @@ Acts as Hubot Adapter
 * Run hubot with `bin/hubot -a qq`
 
 Configurable Variables
- 
+
 	HUBOT_QQ_ID			#QQ ID
 	HUBOT_QQ_PASS		#password
 	HUBOT_QQ_GROUP		#group name that hubot listens to
@@ -51,7 +48,7 @@ On LINUX or OSX use `export VARIABLE=VALUE` to set environment variables.
 
 部署
 -----
-部署环境中一般没法操作`STDIN`和机器人交互，所以现在提供了 `Http Api` 提供验证码输入:    
+部署环境中一般没法操作`STDIN`和机器人交互，所以现在提供了 `Http Api` 提供验证码输入:
 >  GET http://localhost:port/stdin?token=(token)&value=(value)  
 我常用的命令 `./main.coffee nologin &>> tmp/dev.log &`
 
@@ -79,4 +76,3 @@ TODO
 FAQ
 ---
 * QQ纯数字密码的同学，yaml里用 "123456" 代替
-
