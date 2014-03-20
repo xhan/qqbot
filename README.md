@@ -3,18 +3,19 @@ QQBot
 A Hubot adapter for QQ! And also A independence robot lives on the real world.  
 FYI: QQ is a instant messaging service widely used in china provided by Tencent.  
 
-基于[WebQQ协议](https://github.com/xhan/qqbot/blob/master/protocol.md)的QQ机器人。命令行工具，由不可思议的IcedCoffeeScript提供支持。  
+基于[WebQQ协议](https://github.com/xhan/qqbot/blob/master/protocol.md)的QQ机器人。命令行工具，由不可思议的CoffeeScript提供支持。 
 
 >DEMO 调戏用(测试和交流)QQ群：346167134
 
 功能 Features
 -----
 * :muscle:  登录和验证码支持
-* :muscle:  插件化，目前支持消息的派发（你可以编写各种QA形式的插件，做个小黄鸡完全是可以的！欢迎提交有趣的插件）
+* :muscle:  支持好友，群，讨论组的接入
+* :muscle:  插件化，目前支持消息的派发
 * :muscle:  可作为hubot adapter使用
 * :muscle:  提供HTTP API支持（比如群通知什么的都能做哦）
 
-用途
+可以干什么
 -----
 * 辅助管理群成员，比如自动清理刷屏用户啊（请自己实现）
 * 聊天机器人（请自己实现AI）
