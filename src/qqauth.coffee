@@ -168,8 +168,8 @@ exports.login_step2 = (url, callback) ->
 # "http://d.web2.qq.com/channel/login2"
 #  callback( ret , client_id , ptwebqq)
 exports.login_token = (callback) ->
-    # 97518388
-    client_id = 97500000 + parseInt(Math.random() * 99999)
+    # client 是长度8的随机数字
+    client_id = parseInt(Math.random()* 89999999) + 10000000
     ptwebqq   = all_cookies.filter( (item)->item.match /ptwebqq/ )
                            .pop()
                            .replace /ptwebqq\=(.*?);.*/ , '$1'

@@ -63,9 +63,17 @@ handle_resp_body = (body , callback) ->
     callback(ret,err)
 
 
-http_get  = (options , callback) ->
-    options.method = 'GET'
-    http_request( options , null , callback)
+# 2 ways to call it
+# url, params, callback or
+# url, callback
+# 
+http_get  = (args...) ->
+  [url,params,callback] = args
+  [params,callback] = [null,params] unless callback
+  options = 
+    method : 'GET'
+    url    : url    
+  http_request( options , params , callback)
 
 http_post = (options , body, callback) ->
     options.method = 'POST'

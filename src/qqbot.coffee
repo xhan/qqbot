@@ -5,6 +5,11 @@ Dispatcher = require './dispatcher'
 log = new Log('debug')
 jsons = JSON.stringify
 
+MsgType =
+  Default:'message'
+  Group:'group_message'
+  Discuss:'discu_message'
+  
 ###
  cookie , auth 登录需要参数
  config:  配置信息，将 config.yaml
@@ -15,6 +20,10 @@ class QQBot
         @buddy_info = {}
         @group_info = {}
         @groupmember_info = {}
+        
+        # discuss group
+        @dgroup_info = {}
+        @dgroupmember_info = {}
 
         api.cookies @cookies
         @api = api
@@ -29,7 +38,7 @@ class QQBot
     # @format PROTOCOL `群用户信息`
     save_group_member: (group,info)->
         @groupmember_info[group.gid] = info
-
+    
     # 获取用户信息
     # @return {nick,uin,flag,face}
     get_user: (uin) ->
@@ -53,6 +62,23 @@ class QQBot
                 return item[key] == value
         groups.pop()
 
+    # @options {key:value}
+    # @return {name, did}
+    get_dgroup: (options)->
+      try
+        groups = @dgroup_info.dnamelist.filter (item)->
+          for key,value of options
+            return item[key] == value
+        groups.pop()
+
+
+    get_user_in_dgroup: (uin, did)->
+      try
+        info = @dgroupmember_info[did]
+        users = (user for user in info.mem_info when user.uin == uin)
+        users.pop()
+        
+    
     # 获取群列表
     # @callback {ret:bool,error}
     update_group_list: (callback)->
@@ -73,10 +99,28 @@ class QQBot
     # @callback (ret:bool , error)
     update_group_member: (options, callback)->
         group = if options.code then options else @get_group(options)
-        api.get_group_member group.code , @auth , (ret,e)=>
+        @api.get_group_member group.code , @auth , (ret,e)=>
             if ret.retcode == 0
                 @save_group_member(group,ret.result)
             callback(ret.retcode == 0 , e) if callback
+
+    update_dgroup_list: (callback)->
+      log.info "update discuss group list"
+      @api.get_discuss_list @auth, (ret,e)=>
+        log.error e if e
+        @dgroup_info = ret.result if ret.retcode == 0
+        # log.info jsons @dgroup_info
+        callback(ret.retcode == 0, e||'retcode isnot 0') if callback
+    
+    update_dgroup_member: (dgroup,callback)->
+      log.info "update discuss group member #{dgroup.did}"
+      did = dgroup.did
+      @api.get_discuss_member did, @auth, (ret,e)=>
+        if ret.retcode == 0
+          @dgroupmember_info[did] = ret.result
+          # log.info jsons ret.result
+        callback(ret.retcode == 0 , e) if callback
+        
 
     # 更新所有群成员
     # @callback (success,total_count,success_count)
@@ -135,12 +179,13 @@ class QQBot
     # @callback ret, error
     reply_message: (message, content, callback)->
         log.info "发送消息：",content
-        if message.type == 'group'
-            @api.send_msg_2group  message.from_gid , content , @auth, (ret,e)->
-                callback(ret,e) if callback
-        else if message.type == 'buddy'
-            @api.send_msg_2buddy message.from_uin , content , @auth , (ret,e)->
-                callback(ret,e) if callback
+        switch message.type
+          when MsgType.Group
+            @api.send_msg_2group  message.from_gid , content , @auth, callback
+          when MsgType.Default
+            @api.send_msg_2buddy message.from_uin , content , @auth , callback
+          when MsgType.Discuss
+            @api.send_msg_2discuss message.from_did, content, @auth, callback
 
     # 发送群消息
     # @param gid_or_group 
@@ -183,56 +228,65 @@ class QQBot
       @auth['ptwebqq'] = ret.p
       @cb_token_changed(@auth) if @cb_token_changed
 
-
+  
     _handle_poll_event : (event) ->
-        switch event.poll_type
-          when 'group_message' then @_on_message(event)
-          when 'message'       then @_on_message(event)
-          # sys_g_msg
-          # when 'input_notify'  then ""
-          # when 'buddies_status_change' then ""
-          else log.warning "unimplemented event",event.poll_type , "content: ", jsons event
+      switch event.poll_type
+        when MsgType.Default, MsgType.Group, MsgType.Discuss
+          @_on_message(event, event.poll_type)
+        when 'input_notify'  then ""
+        # when 'buddies_status_change' then ""
+        else log.warning "unimplemented event",event.poll_type , "content: ", jsons event
 
-    _on_message : (event)->
-        msg = @_create_message event
-        try
-          if msg.type == 'group'
-            update_group_member msg.from_group unless msg.from_user  #更新新用户
-            log.debug "[群消息]","[#{msg.from_group.name}] #{msg.from_user.nick}:#{msg.content} #{msg.time}"
-          else if msg.type == 'buddy'
-            log.debug "[好友消息]","#{msg.from_user.nick}:#{msg.content} #{msg.time}"
-        catch error
-          log.error "on_message #{error}"
-          log.debug "on_message #{msg}"
+    _on_message : (event, msg_type)->
+      value = event.value
+      msg =
+          content : value.content.slice(-1).pop().trim()
+          time    : new Date(value.time * 1000)
+          from_uin: value.from_uin
+          type    : msg_type
+          uid     : value.msg_id
 
+      if msg_type == MsgType.Group
+        msg.from_gid = msg.from_uin
+        msg.group_code = value.group_code
+        msg.from_uin = value.send_uin # 这才是用户,group消息中 from_uin 是gid
+        msg.from_group = @get_group( {gid:msg.from_gid} )
+        msg.from_user  = @get_user_ingroup( msg.from_uin ,msg.from_gid )      
+        # 更新
+        @update_group_list unless msg.from_group
+        @update_group_member {gid:msg.from_gid} unless msg.from_user
+        
+        msg.from_group ?= {} 
+        msg.from_user  ?= {}
+        try log.debug "[群组消息]","[#{msg.from_group.name}] #{msg.from_user.nick}:#{msg.content} #{msg.time}"
+      else if msg_type == MsgType.Discuss
+        msg.from_did = value.did
+        msg.from_uin = value.send_uin
+        msg.from_dgroup = @get_dgroup({did:value.did})
+        msg.from_user = @get_user_in_dgroup(msg.from_uin,msg.from_did)
+        
+        # 更新
+        @update_dgroup_list() unless msg.from_dgroup
+        @update_dgroup_member {did:value.did} unless msg.from_user
+        msg.from_dgroup ?= {} 
+        msg.from_user  ?= {}
+        
+        try log.debug "[讨论组消息]","[#{msg.from_dgroup.name}] #{msg.from_user.nick}:#{msg.content} #{msg.time}"
+      else if msg_type == MsgType.Default
+        msg.from_user = @get_user( msg.from_uin )
+        #  更新
+        @update_buddy_list unless msg.from_user
+        try log.debug "[好友消息]","#{msg.from_user.nick}:#{msg.content} #{msg.time}"
+      
 
-        # 消息处理
-        replied = false
-        reply = (content)=>
-            @reply_message(msg,content) unless replied
-            replied = true
+      # 消息处理
+      replied = false
+      reply = (content)=>
+          @reply_message(msg,content) unless replied
+          replied = true
 
-        @dispatcher.dispatch(msg.content ,reply, @ , msg)
+      @dispatcher.dispatch(msg.content ,reply, @ , msg)
 
-
-    _create_message : (event)->
-        value = event.value
-        msg =
-            content : value.content.slice(-1).pop().trim()
-            time    : new Date(value.time * 1000)
-            from_uin: value.from_uin
-            type    : if value.group_code then 'group' else 'buddy'
-            uid     : value.msg_id
-
-        if msg.type == 'group'
-            msg.from_gid = msg.from_uin
-            msg.group_code = value.group_code
-            msg.from_uin = value.send_uin # 这才是用户,group消息中 from_uin 是gid
-            msg.from_group = @get_group( {gid:msg.from_gid} )
-            msg.from_user  = @get_user_ingroup( msg.from_uin ,msg.from_gid )
-        else if msg.type == 'buddy'
-            msg.from_user = @get_user( msg.from_uin )
-        msg
 
 
     # 监听特定群并返回群对象
