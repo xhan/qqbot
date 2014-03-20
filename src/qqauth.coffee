@@ -14,8 +14,6 @@ md5 = (str) ->
     md5sum.update(str.toString()).digest('hex')
 
 
-
-
 exports.cookies = ->
     all_cookies
 
