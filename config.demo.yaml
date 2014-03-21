@@ -1,7 +1,7 @@
 # rename this file to config.yaml before start
 # qqbot帐号
 account:  2769546520
-password: 
+password: "123"
 
 # 验证码图片
 port: 3100
@@ -12,7 +12,8 @@ host: localhost
 plugins:
     - help
     - debug
+    - apiserver
 
-# 激活api服务
-api-port:  3000
-api-token: ''
+# apiserver 插件配置
+api_port:  3000
+api_token: ''
