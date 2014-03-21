@@ -1,4 +1,20 @@
 ###
+  # 设置api server
+  apiserver.run(config['api-port'], config['api-token'])
+
+      apiserver.on_groupmessage (name,message,res)->
+        group = bot.get_group {name:name}
+        bot.send_message_to_group group, message, (ret,e)->
+          resp_ret = {bot:ret}
+          if e
+            resp_ret.err = 1
+            resp_ret.msg = "#{e}"
+          res.endjson resp_ret
+###
+
+
+
+###
   QQBot的API Server，支持通过http方式调用Bot功能
   注意：响应 http get/post 参数可设置在url query 或 http body ，两者选其一。 token为必备字段
 
