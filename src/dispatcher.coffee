@@ -8,7 +8,8 @@ requireForce = (module_name) ->
     delete require.cache[require.resolve(module_name)]
     require(module_name)
   catch error
-    log.error "Load module #{module} failed"
+    log.error "Load module #{JSON.stringify module_name} failed"
+    log.error JSON.stringify error
 
 
 class Dispatcher extends EventEmitter
@@ -47,12 +48,12 @@ class Dispatcher extends EventEmitter
       for plugin_name in @plugins
         log.debug "Loading Plugin #{plugin_name}"
         plugin = requireForce "../plugins/#{plugin_name}"
-        
-        if plugin instanceof Function
-          @listeners.push plugin
-        else 
-          @listeners.push plugin.received if plugin.received
-          plugin.init(@robot) if plugin.init
+        if plugin
+          if plugin instanceof Function
+            @listeners.push plugin
+          else 
+            @listeners.push plugin.received if plugin.received
+            plugin.init(@robot) if plugin.init
         
 
 
