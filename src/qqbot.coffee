@@ -161,6 +161,9 @@ class QQBot
         @update_all_group_member (ret,all,successed)->
           actions.groupmember = [1,ret]
           check()
+      
+      log.info 'fetching discuss group list'
+      @update_dgroup_list()
 
 
     # 长轮询
@@ -190,8 +193,11 @@ class QQBot
     send_message_to_group: (gid_or_group, content, callback)->
       gid = if typeof gid_or_group is 'object' then gid_or_group.gid else gid_or_group
       log.info "send msg #{content} to group#{gid}"
-      api.send_msg_2group  gid , content , @auth, (ret,e)->
-        callback(ret,e) if callback
+      api.send_msg_2group  gid , content , @auth, callback
+
+    send_message_to_discuss: (did, content, callback)->
+      log.info "send msg #{content} to discuss#{did}"
+      api.send_msg_2discuss did, content, @auth, callback
 
     # 自杀
     die: (message,info)->
