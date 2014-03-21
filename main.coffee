@@ -10,7 +10,6 @@ log       = new (require 'log')('debug')
 
 auth      = require "./src/qqauth"
 api       = require "./src/qqapi"
-apiserver = require "./src/apiserver"
 QQBot     = require "./src/qqbot"
 defaults  = require './src/defaults'
 config    = require './config'
@@ -41,9 +40,6 @@ get_tokens = (isneedlogin, options,callback)->
 # 获取好友，群，群成员信息，然后进入守护模式
 # TODO: 获取信息 + 守护模式 同步状态
 run = ->
-  # 设置api server
-  apiserver.run(config['api-port'], config['api-token'])
-  
   isneedlogin = process.argv.pop().trim() isnt 'nologin'    
   get_tokens isneedlogin , config , (cookies,auth_info)->
     bot = new QQBot(cookies,auth_info,config)
@@ -54,16 +50,5 @@ run = ->
         process.exit(1)
       log.info "Entering runloop, Enjoy!"
       bot.runloop()
-      
-      apiserver.on_groupmessage (name,message,res)->
-        group = bot.get_group {name:name}
-        bot.send_message_to_group group, message, (ret,e)->
-          resp_ret = {bot:ret}
-          if e
-            resp_ret.err = 1
-            resp_ret.msg = "#{e}"
-          res.endjson resp_ret
+
 run()
-
-
-# TODO: 有一定的概率导致不能发送部分消息，可能是 随机的clientID问题？ -> 修改了随机数范围

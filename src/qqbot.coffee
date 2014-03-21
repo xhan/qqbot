@@ -17,40 +17,37 @@ MsgType =
 ###
 class QQBot
     constructor: (@cookies, @auth, @config) ->
-        @buddy_info = {}
-        @group_info = {}
-        @groupmember_info = {}
-        
-        # discuss group
-        @dgroup_info = {}
-        @dgroupmember_info = {}
+      # PROTOCOL `用户分组信息格式`
+      @buddy_info = {}
+      # PROTOCOL `群分组信息格式`
+      @group_info = {}
+      # PROTOCOL `群用户信息`
+      @groupmember_info = {}
+      
+      # discuss group
+      @dgroup_info = {}
+      @dgroupmember_info = {}
 
-        api.cookies @cookies
-        @api = api
-        @dispatcher = new Dispatcher(@config.plugins)
+      api.cookies @cookies
+      @api = api
+      @dispatcher = new Dispatcher(@config.plugins,@)
 
-    # @format PROTOCOL `用户分组信息格式`
-    save_buddy_info: (@buddy_info)->
-
-    # @format PROTOCOL `群分组信息格式`
-    save_group_info: (@group_info) ->
 
     # @format PROTOCOL `群用户信息`
     save_group_member: (group,info)->
-        @groupmember_info[group.gid] = info
+      @groupmember_info[group.gid] = info
     
     # 获取用户信息
     # @return {nick,uin,flag,face}
     get_user: (uin) ->
-        # TODO:加速查询
-        users = @buddy_info.info.filter (item)-> item.uin == uin
-        users.pop()
+      users = @buddy_info.info.filter (item)-> item.uin == uin
+      users.pop()
 
     # 获取群用户信息
     get_user_ingroup: (uin, gid)->
-        info = @groupmember_info[gid]
-        users = info.minfo.filter (item)-> item.uin == uin
-        users.pop()
+      info = @groupmember_info[gid]
+      users = info.minfo.filter (item)-> item.uin == uin
+      users.pop()
 
 
     # 获取群信息，只支持群 ，支持多关键词搜索
@@ -84,24 +81,24 @@ class QQBot
     update_group_list: (callback)->
       @api.get_group_list @auth, (ret , e)=>
           log.error e  if e
-          @save_group_info ret.result if ret.retcode == 0
+          @group_info = ret.result if ret.retcode == 0
           callback( ret.retcode == 0, e || 'retcode isnot 0' ) if callback
 
     # 获取好友列表
     # @callback (ret:bool, error)
     update_buddy_list: (callback)->
         @api.get_buddy_list @auth , (ret,e)=>
-            @save_buddy_info ret.result if ret.retcode == 0
+            @buddy_info = ret.result if ret.retcode == 0
             callback( ret.retcode == 0, e || 'retcode isnot 0' ) if callback
 
-    # 更新群成员， 似乎获取不到群ID
+    # 更新群成员
     # @options {key:value} or group obj
     # @callback (ret:bool , error)
     update_group_member: (options, callback)->
         group = if options.code then options else @get_group(options)
         @api.get_group_member group.code , @auth , (ret,e)=>
             if ret.retcode == 0
-                @save_group_member(group,ret.result)
+              @save_group_member(group,ret.result)
             callback(ret.retcode == 0 , e) if callback
 
     update_dgroup_list: (callback)->
@@ -164,6 +161,9 @@ class QQBot
         @update_all_group_member (ret,all,successed)->
           actions.groupmember = [1,ret]
           check()
+      
+      log.info 'fetching discuss group list'
+      @update_dgroup_list()
 
 
     # 长轮询
@@ -193,8 +193,11 @@ class QQBot
     send_message_to_group: (gid_or_group, content, callback)->
       gid = if typeof gid_or_group is 'object' then gid_or_group.gid else gid_or_group
       log.info "send msg #{content} to group#{gid}"
-      api.send_msg_2group  gid , content , @auth, (ret,e)->
-        callback(ret,e) if callback
+      api.send_msg_2group  gid , content , @auth, callback
+
+    send_message_to_discuss: (did, content, callback)->
+      log.info "send msg #{content} to discuss#{did}"
+      api.send_msg_2discuss did, content, @auth, callback
 
     # 自杀
     die: (message,info)->

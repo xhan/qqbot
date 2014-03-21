@@ -163,7 +163,7 @@ send_msg_2group = (gid, msg , auth_opts, callback)->
         psessionid:opt.psessionid
     client.post {url:url} , params , (ret,e)->
         log.debug 'send2group',jsons ret
-        callback(ret,e)
+        callback(ret,e) if callback
 
 
 ################################################################################
