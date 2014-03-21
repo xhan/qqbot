@@ -1,11 +1,13 @@
+# 剥离出来的 HttpClient ，目前仅适合 qqapi 使用
+# 返回值：已经解析的json
+
 https = require "https"
 http  = require 'http'
 querystring  = require 'querystring'
 URL  = require('url')
 jsons = JSON.stringify
 
-# 剥离出来的 HttpClient ，目前仅适合 qqapi 使用
-# 返回值：已经解析的json
+
 
 
 # 设置全局cookie
