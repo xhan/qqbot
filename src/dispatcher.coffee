@@ -13,10 +13,9 @@ requireForce = (module_name) ->
 
 
 class Dispatcher extends EventEmitter
-    constructor: (@plugins, @robot) ->
+    constructor: (@plugins=[], @robot) ->
       @listeners = []
       @obj_listeners = []
-      @plugins ||= []
       
       @reload_plugin()
 
@@ -44,6 +43,10 @@ class Dispatcher extends EventEmitter
     
     # 重新加载插件
     reload_plugin:->
+      # 注销插件
+      @stop_funcs ?= []
+      func(@robot) for func in @stop_funcs
+      
       @listeners = []
       for plugin_name in @plugins
         log.debug "Loading Plugin #{plugin_name}"
@@ -51,10 +54,11 @@ class Dispatcher extends EventEmitter
         if plugin
           if plugin instanceof Function
             @listeners.push plugin
-          else 
+          else
+            # init , received, stop  函数
             @listeners.push plugin.received if plugin.received
             plugin.init(@robot) if plugin.init
-        
+            @stop_funcs.push plugin.stop if plugin.stop
 
 
 module.exports = Dispatcher

@@ -66,6 +66,7 @@ class APIServer
   stop: ->
     @http_server.close() if @http_server
     @http_server = null
+    log.info "aip server stoped"
     
   create_server: (port)->
     server = http.createServer (req, res) =>
@@ -152,8 +153,11 @@ class APIServer
 
 ################################################
 # QQBot Plugin 接口
+api_server = null
 exports.init = (qqbot)->  
   api_server = new APIServer(qqbot)
   api_server.start();
 
-  
+exports.stop = (qqbot)->
+  api_server.stop()
+    

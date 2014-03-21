@@ -10,7 +10,7 @@ module.exports = (content ,send, robot, message)->
     robot.dispatcher.reload_plugin()
     send "重新加载插件"
     
-  ret = content.match /^send\s+(.*)\s+(.*)\s+(.*)/i
+  ret = content.match /^send\s+(.*?)\s+(.*?)\s+(.*)/i
   if ret    
     [type,to,msg] = ret[1..3]
     switch type

@@ -3,17 +3,16 @@
 插件支持两个方法调用
  init(robot)
  received(content,send,robot,message)
+ stop(robot)
  
  1.直接使用 
  module.exports = func 为快捷隐式调用 received 方法
  2.或
  module.exports = {
-   init:      init_func
-   received:  received_func
+   init:      init_func       # 初始化调用
+   received:  received_func   # 接受消息
+   stop:      init_func       # 停止插件（比如端口占用）
  }
- 3.或
- exports.init = func
- exports.received = func
  
  
 ###
