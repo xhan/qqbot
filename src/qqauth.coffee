@@ -10,12 +10,11 @@ Log = require 'log'
 log = new Log('debug');
 
 md5 = (str) ->
-    md5sum = crypto.createHash 'md5'
-    md5sum.update(str.toString()).digest('hex')
+  md5sum = crypto.createHash 'md5'
+  md5sum.update(str.toString()).digest('hex')
 
 
-exports.cookies = ->
-    all_cookies
+exports.cookies = -> all_cookies
 
 
 # 是否需要 验证码
@@ -23,76 +22,72 @@ exports.cookies = ->
 # @param callback -> [是否需要验证码 , token , bits ]
 exports.check_qq = (qq, callback) ->
     # TODO: random -> r
-
     options =
-        host: 'ssl.ptlogin2.qq.com'
-        path: "/check?uin=#{qq}&appid=1003903&js_ver=10062&js_type=0&r=0.6569391019121522"
-        headers:
-            'Cookie' : "chkuin=#{qq}"
+      host: 'ssl.ptlogin2.qq.com'
+      path: "/check?uin=#{qq}&appid=1003903&js_ver=10062&js_type=0&r=0.6569391019121522"
+      headers:
+        'Cookie' : "chkuin=#{qq}"
 
     body = '';
     https
         .get options  , (resp) ->
-            all_cookies = resp.headers['set-cookie']
-            resp.on 'data', (chunk) ->
-                body += chunk;
-            resp.on 'end', ->
-                # log body
-                ret = body.match(/\'(.*?)\'/g).map (i)->
-                    last = i.length - 2
-                    i.substr(1 ,last)
-                # log ret
-                callback( ret )
+          all_cookies = resp.headers['set-cookie']
+          resp.on 'data', (chunk) ->
+            body += chunk
+          resp.on 'end', ->
+            # log body
+            ret = body.match(/\'(.*?)\'/g).map (i)->
+              last = i.length - 2
+              i.substr(1 ,last)
+            # log ret
+            callback( ret )
 
         .on "error", (e) ->
-              log.error e
+          log.error e
 
 
 # 获取验证码
 # 记得call  finish_verify_code
 exports.get_verify_code = (qq , host, port, callback) ->
-    # url = "https://ssl.captcha.qq.com/getimage?aid=1003903&r=0.2509327069195215&uin=#{qq}"
-    url = "http://captcha.qq.com/getimage?aid=1003903&r=0.2509327069195215&uin=#{qq}"
-    body = ''
+  url = "http://captcha.qq.com/getimage?aid=1003903&r=0.2509327069195215&uin=#{qq}"
+  body = ''
 
-    http.get url , (resp) ->
-        # log "verify code: #{resp.statusCode}"
-        # log resp.headers
-        all_cookies = all_cookies.concat resp.headers['set-cookie']
-        resp.setEncoding 'binary'
-        resp.on 'data', (chunk) ->
-            body += chunk;
-        resp.on 'end', ->
-            create_img_server(host,port,body,resp.headers)
-            callback()
-    .on "error", (e) ->
-       log.error e
-       callback(e)
+  http.get url , (resp) ->
+    # log "verify code: #{resp.statusCode}"
+    # log resp.headers
+    all_cookies = all_cookies.concat resp.headers['set-cookie']
+    resp.setEncoding 'binary'
+    resp.on 'data', (chunk) ->
+      body += chunk
+    resp.on 'end', ->
+      create_img_server(host,port,body,resp.headers)
+      callback()
+  .on "error", (e) ->
+     log.error e
+     callback(e)
 
 exports.finish_verify_code = -> stop_img_server()
 
 
+# 验证码图片服务
 img_server = null
 create_img_server = (host, port, body ,origin_headers) ->
-    return if img_server
+  return if img_server
 
-    fs = require 'fs'
-    file_path = Path.join __dirname, "..", "tmp", "verifycode.jpg"
-    fs.writeFileSync file_path , body , 'binary'
+  fs = require 'fs'
+  file_path = Path.join __dirname, "..", "tmp", "verifycode.jpg"
+  fs.writeFileSync file_path , body , 'binary'
 
-    img_server = http.createServer (req, res) ->
-      res.writeHead 200 , origin_headers
-      res.end body, 'binary'
+  img_server = http.createServer (req, res) ->
+    res.writeHead 200 , origin_headers
+    res.end body, 'binary'
 
-    img_server.listen port
+  img_server.listen port
 
 
 stop_img_server = ->
-   img_server.close() if img_server
-   img_server = null
-
-
-
+ img_server.close() if img_server
+ img_server = null
 
 
 # 生成加密密码
@@ -148,10 +143,10 @@ exports.login_step1 = (qq, encode_password, verifycode , callback) ->
 exports.login_step2 = (url, callback) ->
     url = Url.parse(url)
     options =
-        host: url.host
-        path: url.path
-        headers:
-            'Cookie' : all_cookies
+      host: url.host
+      path: url.path
+      headers:
+        'Cookie' : all_cookies
 
     body = '';
     http
