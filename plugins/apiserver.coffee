@@ -49,7 +49,7 @@ processPost = (request, response, callback) ->
 
     request.on 'end', ->
       data = querystring.parse(queryData)
-      callback(post)
+      callback(data)
 
     request.on 'error', (error)->
       callback(null, error)
