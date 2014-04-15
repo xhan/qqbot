@@ -214,7 +214,7 @@ class QQBot
         when -1  then log.error "resp is null"
         when 0   then @_handle_poll_event(event) for event in resp.result
         when 102 then 'nothing happened'
-        when 103 then '应该是token失效了，但是偶尔也有情况返回' ; @die("登录异常 #{code}",resp)
+        when 103 then log.error "登录异常 #{code}", resp, 'token失效，但是偶尔也有情况返回'
         when 116 then @_update_ptwebqq(resp)
         when 121 then @die("登录异常 #{code}",resp)
         else log.debug resp
@@ -298,16 +298,16 @@ class QQBot
     listen_group : (name , callback) ->
       log.info 'fetching group list'
       @update_group_list (ret, e) =>
-          log.info '√ group list fetched'
+        log.info '√ group list fetched'
 
-          log.info "fetching groupmember #{name}"
-          @update_group_member {name:name} ,(ret,error)=>
-              log.info '√ group memeber fetched'
+        log.info "fetching groupmember #{name}"
+        @update_group_member {name:name} ,(ret,error)=>
+          log.info '√ group memeber fetched'
 
-              groupinfo = @get_group {name:name}
-              group = new Group(@, groupinfo.gid)
-              @dispatcher.add_listener [group,"dispatch"]
-              callback group
+          groupinfo = @get_group {name:name}
+          group = new Group(@, groupinfo.gid)
+          @dispatcher.add_listener [group,"dispatch"]
+          callback group
 
 
 ###
@@ -316,16 +316,16 @@ class QQBot
  - on_message (content,send_fun, bot , message_info) ->
 ###
 class Group
-    constructor: (@bot,@gid)->
-    send: (content , callback)->
-        @bot.send_message_to_group  @gid , content , (ret,e)->
-            callback(ret,e) if callback
+  constructor: (@bot,@gid)->
+  send: (content , callback)->
+    @bot.send_message_to_group  @gid , content , (ret,e)->
+        callback(ret,e) if callback
 
-    on_message: (@msg_cb)->
-    dispatch: (content ,send, robot, message)->
-        # log.debug 'dispatch',params[0],@msg_cb
-        if message.from_gid == @gid and @msg_cb
-            @msg_cb(content ,send, robot, message)
+  on_message: (@msg_cb)->
+  dispatch: (content ,send, robot, message)->
+    # log.debug 'dispatch',params[0],@msg_cb
+    if message.from_gid == @gid and @msg_cb
+        @msg_cb(content ,send, robot, message)
 
 
 module.exports = QQBot
