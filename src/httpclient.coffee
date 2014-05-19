@@ -18,6 +18,7 @@ global_cookies = (cookie)->
 
 # options url:url
 #         method: GET/POST
+#         debug:false
 # @params 请求参数
 # @callback( ret, error)  ret为json序列对象
 http_request = (options , params , callback) ->
@@ -41,11 +42,14 @@ http_request = (options , params , callback) ->
     options.headers['Referer'] = 'http://d.web2.qq.com/proxy.html?v=20110331002&callback=1&id=3'
 
     req = client.request options, (resp) ->
-        # log "response: #{resp.statusCode}"
-        resp.on 'data', (chunk) ->
-            body += chunk
-        resp.on 'end', ->
-            handle_resp_body(body, callback)
+      if options.debug
+        console.log "response: #{resp.statusCode}"
+        console.log "cookie: #{resp.headers['set-cookie']}"
+      resp.on 'data', (chunk) ->
+        body += chunk
+      resp.on 'end', ->
+        handle_resp_body(body, callback)
+        
     req.on "error" , (e)->
         callback(null,e)
 
