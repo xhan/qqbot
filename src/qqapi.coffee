@@ -43,7 +43,7 @@ long_poll = (auth_opts, callback) ->
         psessionid: psessionid
         r: jsons r
 
-    client.post {url:url,debug:true} , params , (ret,e)->
+    client.post {url:url} , params , (ret,e)->
         long_poll( auth_opts , callback )
         callback(ret,e)
 
