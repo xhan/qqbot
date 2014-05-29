@@ -236,6 +236,8 @@ send_msg_2discuss = (discuss_id, msg, auth_opts, callback)->
       callback(ret,e) if callback
 
 
+change_status = (status, auth_opts, callback)->
+  # nothing
 
 
 module.exports = {

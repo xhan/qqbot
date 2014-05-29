@@ -1,3 +1,4 @@
+auth = require './qqauth'
 api = require './qqapi'
 Log = require 'log'
 Dispatcher = require './dispatcher'
@@ -213,31 +214,50 @@ class QQBot
       switch code
         when -1  then log.error "resp is null"
         when 0   then @_handle_poll_event(event) for event in resp.result
-        when 102 then 'nothing happened'
+        when 102 then 'nothing happened, waiting for next loop'
         when 103 then log.error "登录异常 #{code}", resp, 'token失效，但是偶尔也有情况返回'
         when 116 then @_update_ptwebqq(resp)
         when 121 then @die("登录异常 #{code}",resp)
         else log.debug resp
 
-    # token改变后的通知
-    # callback( @auth )
-    on_token_changed: (callback)->
-      @cb_token_changed = callback
-      
+    ###
+    @callback success:bool
+    ###
+    relogin: (callback)->
+      log.info "relogin..."
+      auth.cookies @cookies
+      # (client_id=null,psessionid=null,callback) ->
+      auth.login_token @auth.clientid, @auth.psessionid, (ret,client_id,ptwebqq) ->
+        if ret.retcode != 0
+          log.error "relogin failed"
+          log.info ret
+          callback(false) if callback
+          return
+
+        log.debug 'before',@auth
+        auth_new =
+          psessionid: ret.result.psessionid
+          clientid  : client_id
+          ptwebqq   : ptwebqq
+          uin       : ret.result.uin
+          vfwebqq   : ret.result.vfwebqq
+          
+        @auth = auth_new
+        log.debug 'after',@auth
+        callback(true) if callback
+
+
     # 更新token ptwebqq的值，返回值{116 ,p=token}
-    # TODO 看看cookie是否也需要修改
     _update_ptwebqq: (ret)->
       log.info 'need to update ptwebqq ',ret
       @auth['ptwebqq'] = ret.p
-      @cb_token_changed(@auth) if @cb_token_changed
 
-  
     _handle_poll_event : (event) ->
       switch event.poll_type
         when MsgType.Default, MsgType.Group, MsgType.Discuss
           @_on_message(event, event.poll_type)
         when 'input_notify'  then ""
-        # when 'buddies_status_change' then ""
+        when 'buddies_status_change' then ""
         else log.warning "unimplemented event",event.poll_type , "content: ", jsons event
 
     _on_message : (event, msg_type)->

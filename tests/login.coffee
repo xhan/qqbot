@@ -29,7 +29,7 @@ prompt = (title, callback) ->
       callback()
 
 test_check_qq = ->
-    auth.check_qq '123774072' , (result) ->
+    auth.check_qq_verify '123774072' , (result) ->
         log int result[0]
         log result[1]
         log result[2]
@@ -47,7 +47,7 @@ test_encode_password2 = ->
 test_login_full = ->
                 
     log "验证帐号..."
-    auth.check_qq qq , (result) ->
+    auth.check_qq_verify qq , (result) ->
         # log "验证帐号:", result
         is_need_verify_code = int result[0]
         verify_code = result[1]
