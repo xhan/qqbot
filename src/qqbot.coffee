@@ -212,7 +212,7 @@ class QQBot
     log.error "poll with error #{e}" if e
     code = if resp then resp.retcode else -1
     switch code
-      when -1  then log.error "resp is null, error on parse ret"
+      when -1  then log.error "resp is null, error on parse ret",resp
       when 0   then @_handle_poll_event(event) for event in resp.result
       when 102 then 'nothing happened, waiting for next loop'
       when 103
@@ -303,9 +303,12 @@ class QQBot
       #  更新
       @update_buddy_list unless msg.from_user
       try log.debug "[好友消息]","#{msg.from_user.nick}:#{msg.content} #{msg.time}"
-    
 
-    # 消息处理
+
+    # 消息和插件处理
+    if @config.offline_msg_keeptime and new Date().getTime() - msg.time.getTime() > @config.offline_msg_keeptime * 1000
+      return
+
     replied = false
     reply = (content)=>
         @reply_message(msg,content) unless replied

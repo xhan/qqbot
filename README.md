@@ -61,13 +61,11 @@ https://github.com/xhan/qqbot/blob/master/CHANGELOG.md
 资料
 ----
 * WebQQ协议     https://github.com/xhan/qqbot/blob/master/protocol.md
-* WebQQ协议专题  http://www.10qf.com/forum-51-1.html
-* 开源的webqq协议的win客户端 https://code.google.com/p/mingqq/
-* http://webqq-core.googlecode.com/
-* https://github.com/im-qq/webqq-core
+* Java版的另一个 http://webqq-core.googlecode.com/
 
 TODO
 ---
+* 自动重新登录
 * 机器人响应前缀
 * 图片发送支持
 * 更多的插件
