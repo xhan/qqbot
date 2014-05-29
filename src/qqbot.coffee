@@ -1,6 +1,7 @@
 auth = require './qqauth'
 api = require './qqapi'
 Log = require 'log'
+Request = require 'request'
 Dispatcher = require './dispatcher'
 
 log = new Log('debug')
@@ -33,6 +34,7 @@ class QQBot
     @api = api
     @dispatcher = new Dispatcher(@config.plugins,@)
     @started = true
+    @request = Request
 
   # @format PROTOCOL `群用户信息`
   save_group_member: (group,info)->

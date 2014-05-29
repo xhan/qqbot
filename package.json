@@ -25,8 +25,9 @@
   },
 
   "dependencies": {
-    "log":                ">= 1.4.0",
-    "js-yaml" :           ">= 3.0.0"
+    "request": "*",
+    "log": ">= 1.4.0",
+    "js-yaml" : ">= 3.0.0"
   },
 
   "engines": {
