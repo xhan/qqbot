@@ -32,7 +32,7 @@ class QQBot
     api.cookies @cookies
     @api = api
     @dispatcher = new Dispatcher(@config.plugins,@)
-
+    @started = true
 
   # @format PROTOCOL `群用户信息`
   save_group_member: (group,info)->
@@ -166,13 +166,20 @@ class QQBot
     log.info 'fetching discuss group list'
     @update_dgroup_list()
 
-
+  
+  # die callback
+  on_die: (callback)->
+    @cb_die = callback
+    
   # 长轮询
   # @callback
   runloop: (callback)->
     @api.long_poll @auth , (ret,e)=>
+      if @started
         @handle_poll_responce ret,e
         callback(ret,e) if callback
+      return @started
+
 
   # 回复消息
   # @param message 收到的message
@@ -203,8 +210,12 @@ class QQBot
   # 自杀
   die: (message,info)->
     #TODO: 这里 log.error 似乎看不到日志输出，试试console
-      console.log "QQBot die! message: #{message}" if message
-      console.log "QQBot die! info #{JSON.stringify info}" if info
+    console.log "QQBot will die! message: #{message}" if message
+    console.log "QQBot will die! info #{JSON.stringify info}" if info
+    @started = false
+    if @cb_die
+      @cb_die()
+    else
       process.exit(1)
 
   # 处理poll返回的内容

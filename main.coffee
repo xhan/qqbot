@@ -7,7 +7,6 @@
 
 
 log       = new (require 'log')('debug')
-
 auth      = require "./src/qqauth"
 api       = require "./src/qqapi"
 QQBot     = require "./src/qqbot"
@@ -17,11 +16,12 @@ config    = require './config'
 KEY_COOKIES = 'qq-cookies'
 KEY_AUTH    = 'qq-auth'
 
-
+###
 # 获取接口需要的cookie和token
 # @param isneedlogin : 是否需要登录，or本地获取
 # @param options     : 配置文件涉及的内容
 # @callback (cookies,auth_info)
+###
 get_tokens = (isneedlogin, options,callback)->
 
   if isneedlogin
@@ -43,7 +43,10 @@ run = ->
   isneedlogin = process.argv.pop().trim() isnt 'nologin'    
   get_tokens isneedlogin , config , (cookies,auth_info)->
     bot = new QQBot(cookies,auth_info,config)
-
+    
+    # if config.keepalive 
+    bot.on_die -> run()
+      
     bot.update_all_members (ret)->
       unless ret
         log.error "获取信息失败"

@@ -25,27 +25,29 @@ cookies = (cookie)->
     return all_cookies
 
 
+###
 # 长轮询，默认一分钟
 #  @param : [clientid,psessionid]
-#  @param callback: ret, e
+#  @param callback: ret, e  callback 返回值 true 才会循环 loop poll
 #  @return ret retcode 102，正常空消息
+###
 long_poll = (auth_opts, callback) ->
     log.debug "polling..."
     [clientid, psessionid] = [auth_opts.clientid, auth_opts.psessionid]
     url = "http://d.web2.qq.com/channel/poll2"
     r =
-        clientid: "#{clientid}"
-        psessionid: psessionid
-        key:0
-        ids:[]
+      clientid: "#{clientid}"
+      psessionid: psessionid
+      key:0
+      ids:[]
     params =
-        clientid: clientid
-        psessionid: psessionid
-        r: jsons r
+      clientid: clientid
+      psessionid: psessionid
+      r: jsons r
 
-    client.post {url:url} , params , (ret,e)->
-        long_poll( auth_opts , callback )
-        callback(ret,e)
+    client.post {url:url} , params , (ret,e)->        
+      need_next_runloop = callback(ret,e)
+      long_poll( auth_opts , callback ) if need_next_runloop
 
 
 # http://0.web.qstatic.com/webqqpic/pubapps/0/50/eqq.all.js
