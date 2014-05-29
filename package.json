@@ -1,6 +1,6 @@
 {
   "name": "hubot-qq",
-  "version": "1.3.1",
+  "version": "1.4.0",
 
   "author": "xhan",
 
@@ -25,7 +25,6 @@
   },
 
   "dependencies": {
-    "scoped-http-client": ">= 0.9.8",
     "log":                ">= 1.4.0",
     "js-yaml" :           ">= 3.0.0"
   },
