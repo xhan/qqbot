@@ -303,3 +303,64 @@ get http://d.web2.qq.com/channel/get_gface_sig2?clientid=72295937&psessionid=836
 
 
 {"retcode":0,"result":[{"poll_type":"discu_message","value":{"msg_id":18803,"from_uin":10000,"to_uin":2769546520,"msg_id2":175418,"msg_type":42,"reply_ip":176488598,"did":2006892653,"send_uin":1657605740,"seq":8,"time":1395249174,"info_seq":2,"content":[["font",{"size":13,"color":"004faa","style":[0,0,0],"name":"STKaiti"}],"world "]}}]}
+
+
+### 全局header
+
+```
+Accept	text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Encoding	gzip, deflate
+Accept-Language	en-US,en;q=0.5
+Connection	keep-alive
+Content-Type	utf-8
+Cookie	pgv_pvid=200718902; ts_uid=3184827993; pt2gguin=o1953024456; RK=pXXKnGphdn; ptcz=7c391c6d99aa6721878e46168f055a4d896d4312382656cfa344ebafdaa73509; hideusehttpstips=1; pgv_info=ssid=s6396104556&pgvReferrer=; ptisp=ctc; verifysession=h02mz5_56T4mZkxOmYRLSTPDJf1Nw9ZHo0ooO9ClWROPye9FukVWemEHC6buD7N7INJXn2vBvy8q0oCcXpfa6r9_Q**; ptui_loginuin=1953024456; uin=o1953024456; skey=@SoxMZ1bd4; ptwebqq=636683b80e7b0b46e26cc6b07c33432a4ab692e52f96e105d4d06fabd0735986; p_uin=o1953024456; p_skey=vnhLt1L6rI9PxEcvDyJCKttVGcjynVh-v7IZlH8s*oM_; pt4_token=rcG*VvNuYkYzE8IcWUGgVg__
+Host	d.web2.qq.com
+Referer	http://d.web2.qq.com/proxy.html?v=20110331002&callback=1&id=2
+User-Agent	Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) Gecko/20100101 Firefox/29.0
+```
+
+### 修改状态
+get http://d.web2.qq.com/channel/change_status2
+
+```
+clientid	34705872
+newstatus	hidden
+psessionid	8368046764001d636f6e6e7365727665725f77656271714031302e3133332e342e313732000024b000001950026e0400c8c968746d0000000a40536f784d5a316264346d000000285859e6c03eb067fa5d389b278a62aeeba9ff31395b9e37a29f5c8f5ba42c3ad2a47cd83332dbe5d8
+t	1401343586702
+```
+
+[online,hidden,busy,callme,offline]
+
+resp:  `{"retcode":0,"result":"ok"} `
+
+
+
+### 获取群号/用户qq号
+get http://s.web2.qq.com/api/get_friend_uin2
+
+```  群
+code	
+t	1401344118978
+tuin	4292540855
+type	4
+verifysession	
+vfwebqq	5859e6c03eb067fa5d389b278a62aeeba9ff31395b9e37a29f5c8f5ba42c3ad2a47cd83332dbe5d8
+```
+
+```
+{"retcode":0,"result":{"uiuin":"","account":346167134,"uin":4292540855}}
+346167134 群号
+```
+
+```  用户
+code	
+t	1401344326640
+tuin	10077914
+type	1
+verifysession	
+vfwebqq	5859e6c03eb067fa5d389b278a62aeeba9ff31395b9e37a29f5c8f5ba42c3ad2a47cd83332dbe5d8
+```
+
+```
+{"retcode":0,"result":{"uiuin":"","account":2489288370,"uin":10077914}}
+```
