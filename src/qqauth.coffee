@@ -199,12 +199,12 @@ exports.login_token = (client_id=null,psessionid=null,callback) ->
       'Cookie' : all_cookies
 
   req = http.request options, (resp) ->
-      log.debug "login token response: #{resp.statusCode}"
-      resp.on 'data', (chunk) ->
-          body += chunk
-      resp.on 'end', ->
-          ret = JSON.parse(body)
-          callback( ret , client_id ,ptwebqq)
+    log.debug "login token response: #{resp.statusCode}"
+    resp.on 'data', (chunk) ->
+      body += chunk
+    resp.on 'end', ->
+      ret = JSON.parse(body)
+      callback( ret , client_id ,ptwebqq)
 
   req.write(data)
   req.end()
@@ -255,7 +255,7 @@ login_next = (account , pass_encrypted , verify_code , callback)->
     log.info "登录 step2 cookie获取"
     auth.login_step2 ret[2] , (ret) ->
       log.info "登录 step3 token 获取"
-      auth.login_token (ret,client_id,ptwebqq) ->
+      auth.login_token null,null,(ret,client_id,ptwebqq) ->
         if ret.retcode == 0
             log.info '登录成功',account
 
