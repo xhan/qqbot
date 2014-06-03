@@ -229,8 +229,8 @@ class QQBot
       when 0   then @_handle_poll_event(event) for event in resp.result
       when 102 then 'nothing happened, waiting for next loop'
       when 103
-        log.error "登录异常 #{code}", resp, 'token失效，但是偶尔也有情况返回'
-        @relogin
+        log.error "登录异常 #{code}", resp, 'token失效，重新登录'
+        @relogin()
       when 116 then @_update_ptwebqq(resp)
       when 121 then @die("登录异常 #{code}",resp)
       else log.debug resp
