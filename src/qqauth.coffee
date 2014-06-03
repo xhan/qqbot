@@ -14,13 +14,14 @@ md5 = (str) ->
   md5sum.update(str.toString()).digest('hex')
 
 
-exports.cookies = -> all_cookies
-
+exports.cookies = (cookies)->
+  all_cookies = cookies if cookies
+  all_cookies
 
 # 是否需要 验证码
 # @param qq
 # @param callback -> [是否需要验证码 , token , bits ]
-exports.check_qq = (qq, callback) ->
+exports.check_qq_verify = (qq, callback) ->
     # TODO: random -> r
     options =
       host: 'ssl.ptlogin2.qq.com'
@@ -92,23 +93,23 @@ stop_img_server = ->
 
 # 生成加密密码
 # @param password 密码
-# @param token    check_qq 参数1 !UGX
-# @param bits     check_qq 参数2 \x00\x11\x00\x11
+# @param token    check_qq_verify 参数1 !UGX
+# @param bits     check_qq_verify 参数2 \x00\x11\x00\x11
 exports.encode_password = (password , token , bits) ->
 
-    password = md5(password)
-    bits = bits.replace(/\\x/g,'')
+  password = md5(password)
+  bits = bits.replace(/\\x/g,'')
 
-    hex2ascii = (hexstr) ->
-        hexstr.match(/\w{2}/g)
-              .map (byte_str) ->
-                  String.fromCharCode parseInt(byte_str,16)
-              .join('')
+  hex2ascii = (hexstr) ->
+    hexstr.match(/\w{2}/g)
+      .map (byte_str) ->
+          String.fromCharCode parseInt(byte_str,16)
+      .join('')
 
-    ret = md5( hex2ascii(password) + hex2ascii(bits) ).toUpperCase() + token.toUpperCase()
-    ret = md5( ret ).toUpperCase()
+  ret = md5( hex2ascii(password) + hex2ascii(bits) ).toUpperCase() + token.toUpperCase()
+  ret = md5( ret ).toUpperCase()
 
-    return ret
+  return ret
 
 
 # 登录 帐号密码验证码 校验
@@ -159,51 +160,54 @@ exports.login_step2 = (url, callback) ->
               log.error e
 
 # "http://d.web2.qq.com/channel/login2"
+# client_id : int
 #  callback( ret , client_id , ptwebqq)
-exports.login_token = (callback) ->
-    # client 是长度8的随机数字
-    client_id = parseInt(Math.random()* 89999999) + 10000000
-    ptwebqq   = all_cookies.filter( (item)->item.match /ptwebqq/ )
-                           .pop()
-                           .replace /ptwebqq\=(.*?);.*/ , '$1'
-    # log all_cookies
-    r =
-        status: "online",
-        ptwebqq: ptwebqq,
-        passwd_sig: "",
-        clientid: "#{client_id}",
-        psessionid: null
-    r = JSON.stringify(r)
+exports.login_token = (client_id=null,psessionid=null,callback) ->
+  # client 是长度8的随机数字
+  client_id ||= parseInt(Math.random()* 89999999) + 10000000
+  client_id = parseInt client_id
+  ptwebqq   = all_cookies.filter( (item)->item.match /ptwebqq/ )
+                         .pop()
+                         .replace /ptwebqq\=(.*?);.*/ , '$1'
+  # log all_cookies
+  r =
+      status: "online",
+      ptwebqq: ptwebqq,
+      passwd_sig: "",
+      clientid: "#{client_id}",
+      psessionid: psessionid
+  r = JSON.stringify(r)
 
-    data = querystring.stringify {
-        clientid: client_id,
-        psessionid: 'null',
-        r: r
-    }
-    # log data
+  data = querystring.stringify {
+      clientid: client_id,
+      # psessionid: 'null',
+      psessionid: psessionid,
+      r: r
+  }
+  # log data
 
-    body = ''
-    options =
-        host: 'd.web2.qq.com',
-        path: '/channel/login2',
-        method: 'POST',
-        headers:
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:27.0) Gecko/20100101 Firefox/27.0',
-            'Referer': 'http://d.web2.qq.com/proxy.html?v=20110331002&callback=1&id=3',
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-            'Content-Length': Buffer.byteLength(data),
-            'Cookie' : all_cookies
+  body = ''
+  options =
+    host: 'd.web2.qq.com',
+    path: '/channel/login2'
+    method: 'POST',
+    headers:
+      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:27.0) Gecko/20100101 Firefox/27.0',
+      'Referer': 'http://d.web2.qq.com/proxy.html?v=20110331002&callback=1&id=3',
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+      'Content-Length': Buffer.byteLength(data),
+      'Cookie' : all_cookies
 
-    req = http.request options, (resp) ->
-        log.debug "login token response: #{resp.statusCode}"
-        resp.on 'data', (chunk) ->
-            body += chunk
-        resp.on 'end', ->
-            ret = JSON.parse(body)
-            callback( ret , client_id ,ptwebqq)
+  req = http.request options, (resp) ->
+    log.debug "login token response: #{resp.statusCode}"
+    resp.on 'data', (chunk) ->
+      body += chunk
+    resp.on 'end', ->
+      ret = JSON.parse(body)
+      callback( ret , client_id ,ptwebqq)
 
-    req.write(data);
-    req.end();
+  req.write(data)
+  req.end()
 
 ###
     全局登录函数，如果有验证码会建立一个 http-server ，同时写入 tmp/*.jpg (osx + open. 操作)
@@ -216,7 +220,7 @@ exports.login = (options, callback) ->
     [qq,pass] = [opt.account,opt.password]
 
     log.info '登录 step0 验证码检测'
-    auth.check_qq qq , (result) ->
+    auth.check_qq_verify qq , (result) ->
       # log.debug "验证帐号:", result
       [need_verify,verify_code,bits] = result
       if int need_verify
@@ -251,7 +255,7 @@ login_next = (account , pass_encrypted , verify_code , callback)->
     log.info "登录 step2 cookie获取"
     auth.login_step2 ret[2] , (ret) ->
       log.info "登录 step3 token 获取"
-      auth.login_token (ret,client_id,ptwebqq) ->
+      auth.login_token null,null,(ret,client_id,ptwebqq) ->
         if ret.retcode == 0
             log.info '登录成功',account
 
@@ -271,7 +275,7 @@ login_next = (account , pass_encrypted , verify_code , callback)->
 
 # prompt user to input something
 # and also listen for process event data
-# @param title : prompt title
+# @params title : prompt title
 # @callback(content)
 exports.prompt = (title, callback) ->
     process.stdin.resume()

@@ -8,6 +8,9 @@ port: 3100
 host: localhost
 
 
+# 消息处理，忽略20分钟外的离线消息
+# offline_msg_keeptime: 1200
+
 # 插件列表
 plugins:
     - help
