@@ -38,8 +38,6 @@ VERSION_INFO = """
     本工具还由 糗事百科 热血赞助！
 """
 
-# 毫秒亲
-start_at = new Date().getTime()
 ###
  @param content 消息内容
  @param send(content)  回复消息
@@ -67,11 +65,12 @@ module.exports = (content ,send, robot, message)->
     send "哈哈，" + ret[1]
       
   if content.match /^uptime$/i
-    secs = (new Date().getTime() - start_at) / 1000
-    aday  = 86400 
-    ahour = 3600
+    secs  = process.uptime()    
+    [aday,ahour]  = [86400 ,3600]
     [day,hour,minute,second] = [secs/ aday,secs%aday/ ahour,secs%ahour/ 60,secs%60].map (i)-> parseInt(i)
-    send "up #{day} days, #{hour}:#{minute}:#{second}"
+    t = (i)-> "0#{i}"[-2..] # 让时间更漂亮
+    memory = process.memoryUsage().rss / 1024 / 1024
+    send "up #{day} days, #{t hour}:#{t minute}:#{t second} | mem: #{memory.toFixed(1)}M"
     
   if content.match /^roll$/i
     # TODO:who? , need a reply method
