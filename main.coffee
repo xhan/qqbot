@@ -41,7 +41,8 @@ get_tokens = (isneedlogin, options,callback)->
 # TODO: 获取信息 + 守护模式 同步状态
 run = ->
   "start qqbot..."
-  isneedlogin = process.argv.pop().trim() isnt 'nologin'    
+  params = process.argv.slice(-1)[0] or ''
+  isneedlogin = params.trim() isnt 'nologin'
   get_tokens isneedlogin , config , (cookies,auth_info)->
     bot = new QQBot(cookies,auth_info,config)
     
