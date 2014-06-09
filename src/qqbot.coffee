@@ -212,13 +212,16 @@ class QQBot
 
   # 自杀
   die: (message,info)->
+    @dispatcher.stop_plugin()
+    @started = false
+    
     #TODO: 这里 log.error 似乎看不到日志输出，试试console
     log.error "QQBot will die! message: #{message}" if message
     console.log "QQBot will die! message: #{message}" if message
     
     log.error "QQBot will die! info #{JSON.stringify info}" if info
     console.log "QQBot will die! info #{JSON.stringify info}" if info
-    @started = false
+    
     if @cb_die
       @cb_die()
     else

@@ -16,7 +16,7 @@ class Dispatcher extends EventEmitter
     constructor: (@plugins=[], @robot) ->
       @listeners = []
       @obj_listeners = []
-      
+      @stop_funcs = []
       @reload_plugin()
 
     dispatch: (params...)->
@@ -41,12 +41,13 @@ class Dispatcher extends EventEmitter
       else
         @obj_listeners.push listener
     
+    # 注销插件
+    stop_plugin: -> func(@robot) for func in @stop_funcs
+      
+    
     # 重新加载插件
     reload_plugin:->
-      # 注销插件
-      @stop_funcs ?= []
-      func(@robot) for func in @stop_funcs
-      
+      @stop_plugin()
       @listeners = []
       for plugin_name in @plugins
         log.debug "Loading Plugin #{plugin_name}"
