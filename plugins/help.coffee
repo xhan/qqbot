@@ -60,9 +60,8 @@ module.exports = (content ,send, robot, message)->
   if content.match /^time$/i
     send "冥王星引力精准校时：" + new Date()
 
-  ret = content.match /^echo (.*)/i
-  if ret
-    send "哈哈，" + ret[1]
+  if ret = content.match /^echo (.*)/i
+    send ret[1]
       
   if content.match /^uptime$/i
     secs  = process.uptime()    
