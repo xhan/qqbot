@@ -40,12 +40,14 @@ get_tokens = (isneedlogin, options,callback)->
 # 获取好友，群，群成员信息，然后进入守护模式
 # TODO: 获取信息 + 守护模式 同步状态
 run = ->
-  isneedlogin = process.argv.pop().trim() isnt 'nologin'    
+  "start qqbot..."
+  params = process.argv.slice(-1)[0] or ''
+  isneedlogin = params.trim() isnt 'nologin'
   get_tokens isneedlogin , config , (cookies,auth_info)->
     bot = new QQBot(cookies,auth_info,config)
     
     # if config.keepalive 
-    bot.on_die -> run()
+    bot.on_die -> run() if isneedlogin
       
     bot.update_all_members (ret)->
       unless ret
