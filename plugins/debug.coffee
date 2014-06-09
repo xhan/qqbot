@@ -8,6 +8,9 @@
 
 
 module.exports = (content ,send, robot, message)->
+  if content.match /^die$/i
+    robot.die("debug")
+    
   if content.match /^reload$/i
     robot.dispatcher.reload_plugin()
     send "重新加载插件"

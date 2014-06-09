@@ -132,6 +132,7 @@ class QQBot
       @update_group_member group , (ret,error)->
         finished += 1; successed += ret
         log.debug "groupmember all#{all} fin#{finished} succ#{successed}"
+        log.debug error if error
         callback(successed == all, finished ,successed) if finished == all
 
   # 更新好友和群成员
@@ -212,7 +213,10 @@ class QQBot
   # 自杀
   die: (message,info)->
     #TODO: 这里 log.error 似乎看不到日志输出，试试console
+    log.error "QQBot will die! message: #{message}" if message
     console.log "QQBot will die! message: #{message}" if message
+    
+    log.error "QQBot will die! info #{JSON.stringify info}" if info
     console.log "QQBot will die! info #{JSON.stringify info}" if info
     @started = false
     if @cb_die
@@ -228,11 +232,8 @@ class QQBot
       when -1  then log.error "resp is null, error on parse ret",resp
       when 0   then @_handle_poll_event(event) for event in resp.result
       when 102 then 'nothing happened, waiting for next loop'
-      when 103
-        log.error "登录异常 #{code}", resp, 'token失效，重新登录'
-        @relogin()
       when 116 then @_update_ptwebqq(resp)
-      when 121 then @die("登录异常 #{code}",resp)
+      when 103,121 then @die("登录异常 #{code}",resp)
       else log.debug resp
 
   ###
