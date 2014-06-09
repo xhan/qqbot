@@ -364,3 +364,48 @@ vfwebqq	5859e6c03eb067fa5d389b278a62aeeba9ff31395b9e37a29f5c8f5ba42c3ad2a47cd833
 ```
 {"retcode":0,"result":{"uiuin":"","account":2489288370,"uin":10077914}}
 ```
+
+
+
+
+
+
+### 未整理
+
+
+错误代码说明: 
+
+ptuiCB('7','0','','0','很遗憾，网络连接出现异常，请您稍后再试。(612369104)'); 
+
+cookie或qq号码问题 
+ptuiCB('0','0','http://aq.qq.com/cn/services/abnormal/abnormal_index? 。。。。。。！');
+帐号冻结 
+
+{"retcode":102 ,"errmsg":""}  
+
+正常连接、没有消息。 
+
+{"retcode":103,"errmsg":""} 
+
+掉线  
+
+{"retcode":108,"errmsg":""}
+
+{"retcode":114,"errmsg":""} 
+
+{"retcode":121,"t":"0"} 
+
+掉线 
+
+{"retcode":122,"errmsg":"wrong web client3"} 
+
+{"retcode":100001}
+
+ 群编号有问题
+
+{"retcode":100006,"errmsg":""} 
+
+
+
+
+

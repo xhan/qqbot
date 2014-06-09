@@ -7,7 +7,7 @@ FYI: QQ is a instant messaging service widely used in china provided by Tencent.
 
 >DEMO 调戏用(测试和交流)QQ群：346167134
 
-功能 Features
+功能主治 Features
 -----
 * :muscle:  登录和验证码支持
 * :muscle:  支持好友，群，讨论组的接入
@@ -15,8 +15,8 @@ FYI: QQ is a instant messaging service widely used in china provided by Tencent.
 * :muscle:  可作为hubot adapter使用
 * :muscle:  提供HTTP API支持（比如群通知什么的都能做哦）
 
-可以干什么
------
+你可以用TA来  
+
 * 辅助管理群成员，比如自动清理刷屏用户啊（请自己实现）
 * 聊天机器人（请自己实现AI）
 * 部署机器人（请了解hubot的概念）
@@ -42,17 +42,21 @@ On LINUX or OSX use `export VARIABLE=VALUE` to set environment variables.
 
 独立作为机器人运行
 -----
-* Install `CoffeeScript` in global by `sudo npm install -g coffee-script`
-* Run `npm install` to update dependencies
-* Make your own copy of `config.yaml`
-* Run `./main.coffee` to keep your bot alive!
+* 执行 `sudo npm install -g coffee-script` 安装 `CoffeeScript`
+* 执行 `npm install` 更新依赖
+* 配置一份你自己的 `config.yaml`
+* 执行 `./main.coffee` 让你的机器人躁起来~
 
 部署
 -----
-部署环境中一般没法操作`STDIN`和机器人交互，所以现在提供了 `Http Api` 提供验证码输入:
->  GET http://localhost:port/stdin?token=(token)&value=(value)  
-我常用的命令 `./main.coffee nologin &>> tmp/dev.log &`
+> 部署环境下请确保你的机器人是不需要**验证码**登录的，否则可能会无法长时间在线  
 
+我常用的命令 `./main.coffee nologin &>> tmp/dev.log &` , 也可以使用进程管理工具比如 `pm2` 更省心
+
+
+API
+----
+TODO GET http://localhost:port/stdin?token=(token)&value=(value)  
 
 改动
 ----
@@ -65,11 +69,8 @@ https://github.com/xhan/qqbot/blob/master/CHANGELOG.md
 
 TODO
 ---
-* 自动重新登录
+* 群成员拉取失败问题跟踪
+* 用户信息,qq号等
 * 机器人响应前缀
 * 图片发送支持
-* 更多的插件
 
-FAQ
----
-* QQ纯数字密码的同学，yaml里用 "123456" 代替
