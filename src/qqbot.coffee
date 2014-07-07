@@ -97,12 +97,12 @@ class QQBot
   # 更新群成员
   # @options {key:value} or group obj
   # @callback (ret:bool , error)
-  update_group_member: (options, callback)->
-      group = if options.code then options else @get_group(options)
-      @api.get_group_member group.code , @auth , (ret,e)=>
-          if ret.retcode == 0
-            @save_group_member(group,ret.result)
-          callback(ret.retcode == 0 , e) if callback
+  update_group_member: (options, callback)->    
+    group = if options.code then options else @get_group(options)
+    @api.get_group_member group.code , @auth , (ret,e)=>
+        if ret.retcode == 0
+          @save_group_member(group,ret.result)
+        callback(ret.retcode == 0 , e) if callback
 
   update_dgroup_list: (callback)->
     log.info "update discuss group list"
@@ -128,6 +128,7 @@ class QQBot
     finished = successed = 0
     groups = @group_info.gnamelist || []
     all = groups.length
+    callback(true,0,0) if all == 0
     for group in groups
       @update_group_member group , (ret,error)->
         finished += 1; successed += ret

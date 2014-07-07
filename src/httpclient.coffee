@@ -78,7 +78,7 @@ http_get  = (args...) ->
   [params,callback] = [null,params] unless callback
   options = 
     method : 'GET'
-    url    : url    
+    url    : url
   http_request( options , params , callback)
 
 http_post = (options , body, callback) ->
