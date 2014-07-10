@@ -9,6 +9,6 @@ module.exports = (content ,send, robot, message)->
   if content.match /^comic$/i
     robot.request.get {url:"http://api.hitokoto.us/rand",json:true}, (e,r,data)->      
       if data and data.hitokoto
-        send data.hitokoto
+        send data.hitokoto + " --" + data.source
       else
         send e

@@ -105,6 +105,7 @@ class APIServer
         when '/stdin' then @on_stdin(req, res, params)
         when '/send'  then @on_sendmsg(req, res, params)
         when '/reload'then @on_reload_plugin(req, res, params)
+        else res.endjson {err:404,msg:'request not fits'}
 
 
   on_stdin : (req,res,params)->
