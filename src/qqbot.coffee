@@ -199,6 +199,14 @@ class QQBot
         when MsgType.Discuss
           @api.send_msg_2discuss message.from_did, content, @auth, callback
 
+  # 发送消息
+  # @param uin 
+  # @callback (ret,e)
+  send_message: (uin_or_user, content, callback)->
+    uin = if typeof uin_or_user is 'object' then uin_or_user.uin else uin_or_user
+    log.info "send msg #{content} to user#{uin}"
+    api.send_msg_2buddy uin, content, @auth, callback
+
   # 发送群消息
   # @param gid_or_group 
   # @callback (ret,e)
