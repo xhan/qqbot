@@ -213,7 +213,7 @@ class QQBot
           call_callbacks ret, null
 
   # 根据 QQ 号码获取 uin
-  # 目前必须调用过 get_friend_account 才可以获取到对应 uin
+  # 目前必须调用过 get_account 才可以获取到对应 uin
   # @param account QQ 号码
   # @return uin
   get_uin: (account)->
