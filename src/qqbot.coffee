@@ -30,6 +30,9 @@ class QQBot
     @dgroup_info = {}
     @dgroupmember_info = {}
 
+    # 账户表
+    @account_table = {}
+
     api.cookies @cookies
     @api = api
     @dispatcher = new Dispatcher(@config.plugins,@)
@@ -170,6 +173,52 @@ class QQBot
     log.info 'fetching discuss group list'
     @update_dgroup_list()
 
+  # 获取 QQ 号码
+  # @param uin_or_user
+  # @callback (error, account)
+  get_account: (uin_or_user, callback)->
+    uin = if typeof uin_or_user is 'object' then uin_or_user.uin else uin_or_user
+    key = "uin" + uin
+    
+    if (info = @account_table[key])?
+      if (acc = info.account)?
+        callback null, acc
+      else
+        info.callbacks.push callback
+    
+    else
+      callbacks = [callback]
+      @account_table[key] = callbacks: callbacks
+      
+      call_callbacks = (err, account)->
+        func err, account for func in callbacks
+
+      log.info "fetching friend account info: uin#{uin}"
+      @api.get_friend_uin2 uin, @auth, (ret, e)=>
+        delete @account_table[key]
+        
+        unless ret?
+          call_callbacks retcode: undefined, null
+          return
+        
+        if (retcode = ret.retcode)? and retcode == 0
+          result = @account_table[key] = ret.result
+          
+          account = result.account
+          account_key = "acc" + account 
+          @account_table[account_key] = result
+          
+          call_callbacks null, account
+        else
+          call_callbacks ret, null
+
+  # 根据 QQ 号码获取 uin
+  # 目前必须调用过 get_friend_account 才可以获取到对应 uin
+  # @param account QQ 号码
+  # @return uin
+  get_uin: (account)->
+    key = "acc" + account
+    return @account_table[key]?.account
   
   # die callback
   on_die: (callback)->
