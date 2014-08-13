@@ -90,6 +90,24 @@ get_buddy_list = (auth_opts, callback)->
     client.post {url:url} , {r:jsons(r)} , (ret,e )->
         callback(ret,e)
 
+#  @param uin     : uin
+#  @param auth_opts: [clientid,psessionid]
+#  @param callback: ret, e
+#  retcode 0
+get_friend_uin2 = (uin, auth_opts, callback)->
+    opt = auth_opts
+    url = "http://s.web2.qq.com/api/get_friend_uin2"
+    params =
+      tuin: uin
+      verifysession: ''
+      type: 1
+      code: ''
+      vfwebqq: opt.vfwebqq
+      t: new Date().getTime()
+
+    client.post {url:url} , params, (ret,e)->
+      callback(ret, e)
+
 #  @param to_uin: uin
 #  @param msg, 消息
 #  @param auth_opts: [clientid,psessionid]
@@ -222,6 +240,7 @@ module.exports = {
   cookies
   long_poll
   get_buddy_list
+  get_friend_uin2
   send_msg_2buddy
   get_group_list
   get_group_member
