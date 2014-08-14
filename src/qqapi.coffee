@@ -90,17 +90,18 @@ get_buddy_list = (auth_opts, callback)->
     client.post {url:url} , {r:jsons(r)} , (ret,e )->
         callback(ret,e)
 
-#  @param uin     : uin
+#  @param tuin:      uin or gid
+#  @param type:      获取 QQ 号码用 1 , 获取群号码用 4 
 #  @param auth_opts: [clientid,psessionid]
-#  @param callback: ret, e
+#  @param callback:  ret, e
 #  retcode 0
-get_friend_uin2 = (uin, auth_opts, callback)->
+get_friend_uin2 = (tuin, type, auth_opts, callback)->
     opt = auth_opts
     url = "http://s.web2.qq.com/api/get_friend_uin2"
     params =
-      tuin: uin
+      tuin: tuin
       verifysession: ''
-      type: 1
+      type: type
       code: ''
       vfwebqq: opt.vfwebqq
       t: new Date().getTime()
