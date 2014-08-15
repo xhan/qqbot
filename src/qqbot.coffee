@@ -31,7 +31,8 @@ class QQBot
     @dgroupmember_info = {}
 
     # 账户表
-    @account_table = {}
+    @user_account_table = {}
+    @group_account_table = {}
 
     api.cookies @cookies
     @api = api
