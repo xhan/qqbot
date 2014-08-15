@@ -31,7 +31,8 @@ class QQBot
     @dgroupmember_info = {}
 
     # 账户表
-    @account_table = {}
+    @user_account_table = {}
+    @group_account_table = {}
 
     api.cookies @cookies
     @api = api
@@ -173,52 +174,102 @@ class QQBot
     log.info 'fetching discuss group list'
     @update_dgroup_list()
 
-  # 获取 QQ 号码
-  # @param uin_or_user
+  # 获取号码信息的通用方法
+  # @param table
+  # @param uin    uin 或 gid
+  # @param type   QQ号码 1, 群号码 4 
   # @callback (error, account)
-  get_account: (uin_or_user, callback)->
-    uin = if typeof uin_or_user is 'object' then uin_or_user.uin else uin_or_user
+  get_account_info_general: (table, uin, type, callback)->
     key = "uin" + uin
     
-    if (info = @account_table[key])?
-      if (acc = info.account)?
+    if info = table[key]
+      if acc = info.account
         callback null, acc
       else
         info.callbacks.push callback
     
     else
       callbacks = [callback]
-      @account_table[key] = callbacks: callbacks
+      table[key] = callbacks: callbacks
       
       call_callbacks = (err, account)->
         func err, account for func in callbacks
 
-      log.info "fetching friend account info: uin#{uin}"
-      @api.get_friend_uin2 uin, @auth, (ret, e)=>
-        delete @account_table[key]
+      log.info "fetching account info: type#{type}, uin#{uin}"
+      @api.get_friend_uin2 uin, type, @auth, (ret, e)=>
+        delete table[key]
         
         unless ret?
-          call_callbacks retcode: undefined, null
+          call_callbacks {}, null
           return
         
-        if (retcode = ret.retcode)? and retcode == 0
-          result = @account_table[key] = ret.result
+        if ret.retcode == 0
+          result = table[key] = ret.result
+          
+          # 不知道为什么，群号码总要减掉这个数才正确……
+          result.account -= 3890000000 if type == 4
           
           account = result.account
-          account_key = "acc" + account 
-          @account_table[account_key] = result
+          account_key = "acc" + account
+          
+          funcs = table[account_key]?.callbacks
+          table[account_key] = result
+          
+          func null, uin for func in funcs if funcs
           
           call_callbacks null, account
         else
           call_callbacks ret, null
-
-  # 根据 QQ 号码获取 uin
-  # 目前必须调用过 get_account 才可以获取到对应 uin
-  # @param account QQ 号码
+          
+  # 通过号码反向获取 uin/gid 的通用方法
+  # @param table
+  # @param account
+  # @callback (error, account)
   # @return uin
-  get_uin: (account)->
+  get_uin_general: (table, account, callback)->
     key = "acc" + account
-    return @account_table[key]?.account
+    if info = table[key]
+      if uin = info.uin
+        callback null, uin if callback
+        return uin
+      else
+        info.callbacks.push callback
+        return null
+    else
+      table[key] = callbacks: [callback] if callback
+      return null
+
+  # 获取 QQ 号码
+  # @param uin_or_user
+  # @callback (error, account)
+  get_user_account: (uin_or_user, callback)->
+    uin = if typeof uin_or_user is 'object' then uin_or_user.uin else uin_or_user
+    @get_account_info_general @user_account_table, uin, 1, callback
+
+  # 根据 QQ 号码获取 uin，目前必须调用过 get_user_account 才可以获取到对应 uin，
+  # 如果不使用 callback 参数的话将会直接返回 uin （不可用时为 null），
+  # 否则将会一直等到可用才会调用 callback
+  # @param account QQ 号码
+  # @callback (error, uin)
+  # @return uin
+  get_user_uin: (account, callback)->
+    return @get_uin_general @user_account_table, account, callback
+    
+  # 获取群号码
+  # @param gid_or_group
+  # @callback (error, account)
+  get_group_account: (gid_or_group, callback)->
+    uin = if typeof gid_or_group is 'object' then gid_or_group.gid else gid_or_group
+    @get_account_info_general @group_account_table, uin, 4, callback
+    
+  # 根据群号码获取 gid，目前必须调用过 get_group_account 才可以获取到对应 gid，
+  # 如果不使用 callback 参数的话将会直接返回 gid （不可用时为 null），
+  # 否则将会一直等到可用才会调用 callback
+  # @param account 群号码
+  # @callback (error, gid)
+  # @return gid
+  get_group_gid: (account, callback)->
+    return @get_uin_general @group_account_table, account, callback
   
   # die callback
   on_die: (callback)->
