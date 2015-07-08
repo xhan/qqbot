@@ -296,10 +296,10 @@ class QQBot
           @api.send_msg_2group  message.from_gid , content , @auth, callback
         when MsgType.Default
           @api.send_msg_2buddy message.from_uin , content , @auth , callback
-        when MsgType.Sess
-          @api.send_msg_2sess  message.from_gid , message.from_uin , content , @auth, callback
         when MsgType.Discuss
           @api.send_msg_2discuss message.from_did, content, @auth, callback
+        when MsgType.Sess
+          @api.send_msg_2sess  message.from_gid , message.from_uin , content , @auth, callback
 
   # 发送消息
   # @param uin
@@ -426,6 +426,11 @@ class QQBot
       msg.from_user  ?= {}
 
       try log.debug "[讨论组消息]","[#{msg.from_dgroup.name}] #{msg.from_user.nick}:#{msg.content} #{msg.time}"
+    else if msg_type == MsgType.Default
+      msg.from_user = @get_user( msg.from_uin )
+      #  更新
+      @update_buddy_list unless msg.from_user
+      try log.debug "[好友消息]","#{msg.from_user.nick}:#{msg.content} #{msg.time}"
     else if msg_type == MsgType.Sess
       msg.from_gid = value.id
       msg.from_uin = value.from_uin
@@ -439,11 +444,6 @@ class QQBot
       msg.from_user  ?= {}
 
       try log.debug "[临时消息]","#{msg.from_user.nick}:#{msg.content} #{msg.time}"
-    else if msg_type == MsgType.Default
-      msg.from_user = @get_user( msg.from_uin )
-      #  更新
-      @update_buddy_list unless msg.from_user
-      try log.debug "[好友消息]","#{msg.from_user.nick}:#{msg.content} #{msg.time}"
 
 
     # 消息和插件处理
