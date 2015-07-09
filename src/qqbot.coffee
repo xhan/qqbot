@@ -9,9 +9,10 @@ jsons = JSON.stringify
 
 MsgType =
   Default:'message'
+  Sess:'sess_message'
   Group:'group_message'
   Discuss:'discu_message'
-  
+
 ###
  cookie , auth 登录需要参数
  config:  配置信息，将 config.yaml
@@ -25,7 +26,7 @@ class QQBot
     @group_info = {}
     # PROTOCOL `群用户信息`
     @groupmember_info = {}
-    
+
     # discuss group
     @dgroup_info = {}
     @dgroupmember_info = {}
@@ -43,7 +44,7 @@ class QQBot
   # @format PROTOCOL `群用户信息`
   save_group_member: (group,info)->
     @groupmember_info[group.gid] = info
-  
+
   # 获取用户信息
   # @return {nick,uin,flag,face}
   get_user: (uin) ->
@@ -55,7 +56,6 @@ class QQBot
     info = @groupmember_info[gid]
     users = info.minfo.filter (item)-> item.uin == uin
     users.pop()
-
 
   # 获取群信息，只支持群 ，支持多关键词搜索
   # @options {key:value}
@@ -81,8 +81,8 @@ class QQBot
       info = @dgroupmember_info[did]
       users = (user for user in info.mem_info when user.uin == uin)
       users.pop()
-      
-  
+
+
   # 获取群列表
   # @callback {ret:bool,error}
   update_group_list: (callback)->
@@ -101,7 +101,7 @@ class QQBot
   # 更新群成员
   # @options {key:value} or group obj
   # @callback (ret:bool , error)
-  update_group_member: (options, callback)->    
+  update_group_member: (options, callback)->
     group = if options.code then options else @get_group(options)
     @api.get_group_member group.code , @auth , (ret,e)=>
         if ret.retcode == 0
@@ -115,7 +115,7 @@ class QQBot
       @dgroup_info = ret.result if ret.retcode == 0
       # log.info jsons @dgroup_info
       callback(ret.retcode == 0, e||'retcode isnot 0') if callback
-  
+
   update_dgroup_member: (dgroup,callback)->
     log.info "update discuss group member #{dgroup.did}"
     did = dgroup.did
@@ -124,7 +124,7 @@ class QQBot
         @dgroupmember_info[did] = ret.result
         # log.info jsons ret.result
       callback(ret.retcode == 0 , e) if callback
-      
+
 
   # 更新所有群成员
   # @callback (success,total_count,success_count)
@@ -170,57 +170,57 @@ class QQBot
       @update_all_group_member (ret,all,successed)->
         actions.groupmember = [1,ret]
         check()
-    
+
     log.info 'fetching discuss group list'
     @update_dgroup_list()
 
   # 获取号码信息的通用方法
   # @param table
   # @param uin    uin 或 gid
-  # @param type   QQ号码 1, 群号码 4 
+  # @param type   QQ号码 1, 群号码 4
   # @callback (error, account)
   get_account_info_general: (table, uin, type, callback)->
     key = "uin" + uin
-    
+
     if info = table[key]
       if acc = info.account
         callback null, acc
       else
         info.callbacks.push callback
-    
+
     else
       callbacks = [callback]
       table[key] = callbacks: callbacks
-      
+
       call_callbacks = (err, account)->
         func err, account for func in callbacks
 
       log.info "fetching account info: type#{type}, uin#{uin}"
       @api.get_friend_uin2 uin, type, @auth, (ret, e)=>
         delete table[key]
-        
+
         unless ret?
           call_callbacks {}, null
           return
-        
+
         if ret.retcode == 0
           result = table[key] = ret.result
-          
+
           # 不知道为什么，群号码总要减掉这个数才正确……
           result.account -= 3890000000 if type == 4
-          
+
           account = result.account
           account_key = "acc" + account
-          
+
           funcs = table[account_key]?.callbacks
           table[account_key] = result
-          
+
           func null, uin for func in funcs if funcs
-          
+
           call_callbacks null, account
         else
           call_callbacks ret, null
-          
+
   # 通过号码反向获取 uin/gid 的通用方法
   # @param table
   # @param account
@@ -254,14 +254,14 @@ class QQBot
   # @return uin
   get_user_uin: (account, callback)->
     return @get_uin_general @user_account_table, account, callback
-    
+
   # 获取群号码
   # @param gid_or_group
   # @callback (error, account)
   get_group_account: (gid_or_group, callback)->
     uin = if typeof gid_or_group is 'object' then gid_or_group.gid else gid_or_group
     @get_account_info_general @group_account_table, uin, 4, callback
-    
+
   # 根据群号码获取 gid，目前必须调用过 get_group_account 才可以获取到对应 gid，
   # 如果不使用 callback 参数的话将会直接返回 gid （不可用时为 null），
   # 否则将会一直等到可用才会调用 callback
@@ -270,11 +270,11 @@ class QQBot
   # @return gid
   get_group_gid: (account, callback)->
     return @get_uin_general @group_account_table, account, callback
-  
+
   # die callback
   on_die: (callback)->
     @cb_die = callback
-    
+
   # 长轮询
   # @callback
   runloop: (callback)->
@@ -298,9 +298,11 @@ class QQBot
           @api.send_msg_2buddy message.from_uin , content , @auth , callback
         when MsgType.Discuss
           @api.send_msg_2discuss message.from_did, content, @auth, callback
+        when MsgType.Sess
+          @api.send_msg_2sess  message.from_gid , message.from_uin , content , @auth, callback
 
   # 发送消息
-  # @param uin 
+  # @param uin
   # @callback (ret,e)
   send_message: (uin_or_user, content, callback)->
     uin = if typeof uin_or_user is 'object' then uin_or_user.uin else uin_or_user
@@ -308,7 +310,7 @@ class QQBot
     api.send_msg_2buddy uin, content, @auth, callback
 
   # 发送群消息
-  # @param gid_or_group 
+  # @param gid_or_group
   # @callback (ret,e)
   send_message_to_group: (gid_or_group, content, callback)->
     gid = if typeof gid_or_group is 'object' then gid_or_group.gid else gid_or_group
@@ -323,14 +325,14 @@ class QQBot
   die: (message,info)->
     @dispatcher.stop_plugin()
     @started = false
-    
+
     #TODO: 这里 log.error 似乎看不到日志输出，试试console
     log.error "QQBot will die! message: #{message}" if message
     console.log "QQBot will die! message: #{message}" if message
-    
+
     log.error "QQBot will die! info #{JSON.stringify info}" if info
     console.log "QQBot will die! info #{JSON.stringify info}" if info
-    
+
     if @cb_die
       @cb_die()
     else
@@ -370,7 +372,7 @@ class QQBot
         ptwebqq   : ptwebqq
         uin       : ret.result.uin
         vfwebqq   : ret.result.vfwebqq
-        
+
       @auth = auth_new
       log.debug 'after',@auth
       callback(true) if callback
@@ -383,7 +385,7 @@ class QQBot
 
   _handle_poll_event : (event) ->
     switch event.poll_type
-      when MsgType.Default, MsgType.Group, MsgType.Discuss
+      when MsgType.Default, MsgType.Sess, MsgType.Group, MsgType.Discuss
         @_on_message(event, event.poll_type)
       when 'input_notify'  then ""
       when 'buddies_status_change' then ""
@@ -403,12 +405,12 @@ class QQBot
       msg.group_code = value.group_code
       msg.from_uin = value.send_uin # 这才是用户,group消息中 from_uin 是gid
       msg.from_group = @get_group( {gid:msg.from_gid} )
-      msg.from_user  = @get_user_ingroup( msg.from_uin ,msg.from_gid )      
+      msg.from_user  = @get_user_ingroup( msg.from_uin ,msg.from_gid )
       # 更新
       @update_group_list unless msg.from_group
       @update_group_member {gid:msg.from_gid} unless msg.from_user
-      
-      msg.from_group ?= {} 
+
+      msg.from_group ?= {}
       msg.from_user  ?= {}
       try log.debug "[群组消息]","[#{msg.from_group.name}] #{msg.from_user.nick}:#{msg.content} #{msg.time}"
     else if msg_type == MsgType.Discuss
@@ -416,19 +418,32 @@ class QQBot
       msg.from_uin = value.send_uin
       msg.from_dgroup = @get_dgroup({did:value.did})
       msg.from_user = @get_user_in_dgroup(msg.from_uin,msg.from_did)
-      
+
       # 更新
       @update_dgroup_list() unless msg.from_dgroup
       @update_dgroup_member {did:value.did} unless msg.from_user
-      msg.from_dgroup ?= {} 
+      msg.from_dgroup ?= {}
       msg.from_user  ?= {}
-      
+
       try log.debug "[讨论组消息]","[#{msg.from_dgroup.name}] #{msg.from_user.nick}:#{msg.content} #{msg.time}"
     else if msg_type == MsgType.Default
       msg.from_user = @get_user( msg.from_uin )
       #  更新
       @update_buddy_list unless msg.from_user
       try log.debug "[好友消息]","#{msg.from_user.nick}:#{msg.content} #{msg.time}"
+    else if msg_type == MsgType.Sess
+      msg.from_gid = value.id
+      msg.from_uin = value.from_uin
+      msg.from_group = @get_group( {gid:msg.from_gid} )
+      msg.from_user  = @get_user_ingroup( msg.from_uin ,msg.from_gid )
+      # 更新
+      @update_group_list unless msg.from_group
+      @update_group_member {gid:msg.from_gid} unless msg.from_user
+
+      msg.from_group ?= {}
+      msg.from_user  ?= {}
+
+      try log.debug "[临时消息]","#{msg.from_user.nick}:#{msg.content} #{msg.time}"
 
 
     # 消息和插件处理

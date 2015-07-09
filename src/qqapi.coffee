@@ -132,6 +132,40 @@ send_msg_2buddy = (to_uin , msg , auth_opts ,callback)->
     callback(ret , e) if callback
 
 ################################################################################
+#  临时消息
+
+#  @param to_uin: uin
+#  @param msg, 消息
+#  @param auth_opts: [clientid,psessionid]
+#  @param callback: ret, e
+#  @return ret retcode 0
+send_msg_2sess = (to_gid , to_uin , msg , auth_opts ,callback)->
+  opt = auth_opts
+
+  url = "http://d.web2.qq.com/channel/get_c2cmsg_sig2?id="+to_gid+"&to_uin="+to_uin+"&clientid="+opt.clientid+"&psessionid="+opt.psessionid+"&service_type=0&t="+new Date().getTime()
+
+  client.get url , (ret,e) ->
+    if !e
+      url = "http://d.web2.qq.com/channel/send_sess_msg2"
+
+      r =
+      to: to_uin
+      face: 594
+      msg_id: msg_id++
+      clientid: "#{opt.clientid}"
+      psessionid: opt.psessionid
+      group_sig: ret.result.value
+      content: jsons ["#{msg}", ["font", {name:"宋体", size:"10", style:[0,0,0], color:"000000" }] ]
+
+      params =
+      r: jsons r
+
+      # log params
+      client.post {url:url} , params , (ret,e) ->
+        log.debug 'send2user',jsons ret
+        callback(ret , e) if callback
+
+################################################################################
 #  群
 
 #  获取群列表
@@ -238,6 +272,7 @@ module.exports = {
   get_buddy_list
   get_friend_uin2
   send_msg_2buddy
+  send_msg_2sess
   get_group_list
   get_group_member
   send_msg_2group

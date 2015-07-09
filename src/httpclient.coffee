@@ -37,7 +37,7 @@ http_request = (options , params , callback) ->
       query = querystring.stringify params
       append = if aurl.query then '&' else '?'
       options.path += append + query
-      
+
     options.headers['Cookie'] = all_cookies
     options.headers['Referer'] = 'http://d.web2.qq.com/proxy.html?v=20110331002&callback=1&id=3'
 
@@ -48,8 +48,8 @@ http_request = (options , params , callback) ->
       resp.on 'data', (chunk) ->
         body += chunk
       resp.on 'end', ->
-        handle_resp_body(body, callback)
-        
+        handle_resp_body(body, options, callback)
+
     req.on "error" , (e)->
         callback(null,e)
 
@@ -57,12 +57,12 @@ http_request = (options , params , callback) ->
         req.write(data);
     req.end();
 
-handle_resp_body = (body , callback) ->
+handle_resp_body = (body , options , callback) ->
     err = null
     try
         ret = JSON.parse body
     catch error
-        console.log "解析出错",body
+        console.log "解析出错", options.url, body
         console.log error
         err = error
         ret = null
@@ -72,11 +72,11 @@ handle_resp_body = (body , callback) ->
 # 2 ways to call it
 # url, params, callback or
 # url, callback
-# 
+#
 http_get  = (args...) ->
   [url,params,callback] = args
   [params,callback] = [null,params] unless callback
-  options = 
+  options =
     method : 'GET'
     url    : url
   http_request( options , params , callback)
