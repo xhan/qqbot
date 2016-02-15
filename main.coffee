@@ -7,7 +7,7 @@
 
 
 log       = new (require 'log')('debug')
-auth      = require "./src/qqauth"
+auth      = require "./src/qqauth_qrcode"
 api       = require "./src/qqapi"
 QQBot     = require "./src/qqbot"
 defaults  = require './src/defaults'
@@ -53,6 +53,13 @@ run = ->
       unless ret
         log.error "获取信息失败"
         process.exit(1)
+
+      console.log "Group List:"
+      console.log "    #{v.name} (#{v.gid})" for k, v of bot.group_info.gnamelist
+
+      console.log "Buddy List:"
+      console.log "    #{v.nick} (#{v.uin})" for k, v of bot.buddy_info.info
+
       log.info "Entering runloop, Enjoy!"
       bot.runloop()
 

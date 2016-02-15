@@ -120,12 +120,19 @@ class APIServer
   on_sendmsg : (req,res,params)->
     log.info "will send #{params.type} #{params.to} : #{params.msg}"
     if params.type == 'buddy'
-      msg =  "unimplement type #{params.type}"
-      log.warning msg
-      res.endjson {err:100,msg:msg}
+      user = params.to
+      @qqbot.send_message user, params.msg, (ret,e)->
+        resp_ret = {result:ret}
+        if e
+          resp_ret.err = 1
+          resp_ret.msg = "#{e}"
+        res.endjson resp_ret
       
     else if params.type == 'group'
-      group = @qqbot.get_group {name:params.to}
+      if parseInt(params.to) > 0
+        group = params.to
+      else
+        group = @qqbot.get_group {name:params.to}
       @qqbot.send_message_to_group group, params.msg, (ret,e)->
         resp_ret = {result:ret}
         if e
