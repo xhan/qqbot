@@ -53,6 +53,7 @@ class QQBot
 
   # 获取群用户信息
   get_user_ingroup: (uin, gid)->
+    if !@groupmember_info[gid] then return null
     info = @groupmember_info[gid]
     users = info.minfo.filter (item)-> item.uin == uin
     users.pop()
@@ -103,7 +104,7 @@ class QQBot
   # @callback (ret:bool , error)
   update_group_member: (options, callback)->
     group = if options.code then options else @get_group(options)
-    @api.get_group_member group.code , @auth , (ret,e)=>
+    @api.get_group_member (group or {}).code , @auth , (ret,e)=>
         if ret.retcode == 0
           @save_group_member(group,ret.result)
         callback(ret.retcode == 0 , e) if callback
@@ -401,6 +402,7 @@ class QQBot
       uid     : value.msg_id
 
     if msg_type == MsgType.Group
+      msg.gnum = value.info_seq
       msg.from_gid = msg.from_uin
       msg.group_code = value.group_code
       msg.from_uin = value.send_uin # 这才是用户,group消息中 from_uin 是gid
